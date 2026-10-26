@@ -267,7 +267,7 @@ let sb = null;
 function client() {
   if (!window.supabase) return null;
   if (!sb) sb = window.supabase.createClient(CFG.url, CFG.key, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'sk.auth' },
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit', storageKey: 'sk.auth' },
   });
   return sb;
 }
@@ -685,7 +685,7 @@ async function sendCode() {
   const email = (el ? el.value : S.authEmail).trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter a valid email');
   if (!navigator.onLine) return toast('Connect to the internet to sign in');
-  const { error } = await client().auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  const { error } = await client().auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } });
   if (error) return toast(/rate|seconds/i.test(error.message) ? 'Please wait a minute before asking for another code' : 'Could not send: ' + error.message, 4500);
   S.authEmail = email; LS.set('authEmail', email); S.authStep = 'code'; render();
   setTimeout(() => document.getElementById('onb-otp')?.focus(), 100);
@@ -1003,8 +1003,13 @@ render();
 (async () => {
   const c = client();
   if (!c) { S.booting = false; render(); return toast('Could not load — check your connection'); }
-  const { data } = await c.auth.getSession();
+  const { data, error: linkErr } = await c.auth.getSession();
   S.user = data?.session?.user || null;
+  // arrived from the email link: tidy the address bar
+  if (/access_token|error_description/.test(location.hash)) {
+    if (/error_description/.test(location.hash)) toast('That sign-in link has expired — ask for a new code', 4500);
+    history.replaceState(null, '', location.pathname + location.search);
+  }
   if (S.user && S.family && S.me && me()) { S.booting = false; render(); pull(); loadMembership(); }
   else if (S.user) await loadMembership();
   else { S.booting = false; render(); }
