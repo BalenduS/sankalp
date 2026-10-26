@@ -1,0 +1,16 @@
+{
+  "name": "Sankalp — Hanuman Chalisa & Sadhana",
+  "short_name": "Sankalp",
+  "description": "Track Hanuman Chalisa and other sadhanas together as a family.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF7EC",
+  "theme_color": "#E8650F",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

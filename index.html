@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sankalp</title>
+<meta name="description" content="Hanuman Chalisa & sadhana tracker for the family">
+<meta name="theme-color" content="#E8650F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Sankalp">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Serif+Telugu:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#FFF7EC; --card:#FFFFFF; --ink:#2A1A0E; --muted:#8A7462; --line:#F0E2CF;
+  --saffron:#E8650F; --saffron2:#F59E2B; --deep:#B8420A; --soft:#FFEBD2; --ok:#2F9E5B; --okSoft:#DDF3E5;
+  --miss:#D9483B; --missSoft:#FCE3E0; --shadow:0 1px 2px rgba(80,40,0,.06),0 6px 20px rgba(120,60,0,.07);
+  --r:20px; --safeB:env(safe-area-inset-bottom,0px); --safeT:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#17110C;--card:#231A13;--ink:#F6E9DA;--muted:#B39C86;--line:#3A2B1F;--soft:#3A2412;--okSoft:#173623;--missSoft:#3D1A16;--shadow:0 1px 2px rgba(0,0,0,.4)}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;font-size:16px}
+body{min-height:100dvh;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;outline:none}
+input:focus,textarea:focus{border-color:var(--saffron)}
+.wrap{max-width:560px;margin:0 auto;padding:calc(var(--safeT) + 14px) 16px calc(var(--safeB) + 96px)}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.top img{width:42px;height:42px;border-radius:12px}
+.top h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.3px}
+.top .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.sync{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.dot.off{background:#BBB}.dot.wait{background:var(--saffron2)}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:26px 4px 10px;font-weight:700}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;border:1px solid var(--line)}
+.sd-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.sd-title{font-weight:800;font-size:19px;line-height:1.2}
+.sd-meta{color:var(--muted);font-size:13px;margin-top:4px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--deep);font-weight:700;font-size:12px;padding:5px 10px;border-radius:99px;white-space:nowrap}
+@media (prefers-color-scheme:dark){.pill{color:#FFB26B}}
+.pill.ok{background:var(--okSoft);color:var(--ok)}
+.counter{display:flex;align-items:center;justify-content:center;gap:22px;margin:18px 0 8px}
+.ring{position:relative;width:168px;height:168px;border-radius:50%;display:grid;place-items:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:transform .08s}
+.ring:active{transform:scale(.96)}
+.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring .inner{width:136px;height:136px;border-radius:50%;background:linear-gradient(160deg,var(--saffron2),var(--saffron) 55%,var(--deep));display:grid;place-items:center;color:#fff;box-shadow:inset 0 -6px 14px rgba(0,0,0,.15),0 8px 22px rgba(232,101,15,.35);text-align:center}
+.ring.done .inner{background:linear-gradient(160deg,#58C27F,var(--ok))}
+.ring .big{font-size:40px;font-weight:800;line-height:1}
+.ring .small{font-size:12px;opacity:.9;margin-top:4px;font-weight:600}
+.side{display:flex;flex-direction:column;gap:10px}
+.mini{width:48px;height:48px;border-radius:50%;background:var(--soft);font-size:20px;font-weight:800;display:grid;place-items:center;color:var(--deep)}
+.mini.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted)}
+.hint{text-align:center;color:var(--muted);font-size:13px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
+.dots i{width:11px;height:11px;border-radius:4px;background:var(--line);display:block}
+.dots i.done{background:var(--saffron)}
+.dots i.partial{background:var(--saffron2);opacity:.5}
+.dots i.missed{background:var(--miss)}
+.dots i.today,.dots i.partial-today{outline:2px solid var(--saffron);outline-offset:1px;background:var(--soft)}
+.dots i.partial-today{background:var(--saffron2)}
+.dots i.excused{background:transparent;border:1.5px dashed var(--muted)}
+.row{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:14px;font-weight:700;background:var(--soft);color:var(--deep)}
+@media (prefers-color-scheme:dark){.btn{color:#FFB26B}}
+.btn.primary{background:var(--saffron);color:#fff}
+.btn.block{width:100%}
+.btn.sm{padding:9px 13px;font-size:14px;border-radius:12px}
+.btn.line{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.btn.danger{background:var(--missSoft);color:var(--miss)}
+.actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.banner{border-radius:16px;padding:14px 16px;margin-bottom:14px;background:var(--soft);font-size:14px;line-height:1.45}
+.banner.miss{background:var(--missSoft)}
+.banner b{display:block;margin-bottom:4px;font-size:15px}
+.empty{text-align:center;padding:30px 10px}
+.empty img{width:96px;height:96px;border-radius:26px;margin-bottom:12px;box-shadow:var(--shadow)}
+.empty h3{margin:6px 0;font-size:22px}
+.empty p{color:var(--muted);margin:6px 0 18px;line-height:1.5}
+.fam{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.fam:last-child{border:0}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;flex:none}
+.fam .t{flex:1;min-width:0}.fam .n{font-weight:700}.fam .m{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.check{font-size:20px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:var(--safeB);z-index:20}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;padding:10px 0 9px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted)}
+nav.tabs button.on{color:var(--saffron)}
+nav.tabs svg{width:24px;height:24px}
+.fab{position:fixed;right:max(18px,calc(50% - 262px));bottom:calc(var(--safeB) + 80px);width:58px;height:58px;border-radius:20px;background:var(--saffron);color:#fff;font-size:30px;box-shadow:0 10px 24px rgba(232,101,15,.45);z-index:21;display:grid;place-items:center}
+.sheet-bg{position:fixed;inset:0;background:rgba(30,15,0,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:92dvh;overflow:auto;border-radius:26px 26px 0 0;padding:10px 18px calc(var(--safeB) + 22px);animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 14px}
+.sheet h3{margin:0 0 4px;font-size:22px}
+.lbl{font-size:13px;font-weight:700;color:var(--muted);margin:18px 2px 8px;text-transform:uppercase;letter-spacing:.6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;border-radius:13px;background:var(--card);border:1.5px solid var(--line);font-weight:600;font-size:15px}
+.chip.on{border-color:var(--saffron);background:var(--soft);color:var(--deep)}
+@media (prefers-color-scheme:dark){.chip.on{color:#FFB26B}}
+.chip small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plans .chip{text-align:left}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin:0 2px 5px}
+details.guide{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:12px}
+details.guide summary{font-weight:700;cursor:pointer}
+details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14px;color:var(--muted)}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 2px}
+.sw{width:50px;height:30px;border-radius:99px;background:var(--line);position:relative;transition:.2s;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw.on{background:var(--saffron)}.sw.on::after{left:23px}
+.reader{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;animation:fade .2s}
+.reader header{display:flex;align-items:center;gap:8px;padding:calc(var(--safeT) + 10px) 14px 10px;border-bottom:1px solid var(--line)}
+.reader header .ttl{flex:1;font-weight:800}
+.reader .body{flex:1;overflow:auto;padding:22px 20px 40px;max-width:640px;margin:0 auto;width:100%}
+.verse{display:flex;gap:12px;margin:0 0 18px;line-height:1.75}
+.verse .no{color:var(--saffron);font-weight:700;font-size:13px;min-width:20px;padding-top:.45em}
+.verse .tx{font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-weight:500}
+.tel .verse .tx{font-family:"Noto Serif Telugu",serif}
+.doha{text-align:center;margin:8px 0 26px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;line-height:1.8;color:var(--deep)}
+@media (prefers-color-scheme:dark){.doha{color:#FFB26B}}
+.doha small{display:block;font-family:Figtree;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.reader footer{padding:12px 16px calc(var(--safeB) + 12px);border-top:1px solid var(--line);background:var(--card)}
+.seg{display:inline-flex;background:var(--soft);border-radius:11px;padding:3px}
+.seg button{padding:6px 10px;border-radius:9px;font-weight:700;font-size:13px}
+.seg button.on{background:var(--card);box-shadow:var(--shadow)}
+.toast{position:fixed;left:50%;bottom:calc(var(--safeB) + 150px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;z-index:90;max-width:90vw;text-align:center;animation:up .25s}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:18px;letter-spacing:1px;background:var(--soft);padding:10px 14px;border-radius:12px;text-align:center;font-weight:700}
+.list-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border:0}
+.muted{color:var(--muted)}
+.burst{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}
+.burst span{position:absolute;font-size:26px;animation:fly 1.4s ease-out forwards}
+.center-msg{position:fixed;inset:0;display:grid;place-items:center;z-index:96;pointer-events:none}
+.center-msg div{background:var(--card);padding:22px 28px;border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.2);text-align:center;font-weight:800;font-size:20px;animation:pop 1.8s ease forwards}
+.center-msg small{display:block;font-weight:600;font-size:14px;color:var(--muted);margin-top:4px}
+@keyframes fly{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(1.2) rotate(var(--r));opacity:0}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}15%{transform:scale(1.05);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}}
+.onb{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;max-width:440px;margin:0 auto;padding:24px 20px}
+.onb .logo{width:112px;height:112px;border-radius:30px;margin:0 auto 18px;box-shadow:0 18px 40px rgba(232,101,15,.3);display:block}
+.onb h1{text-align:center;font-size:30px;margin:0;letter-spacing:-.5px}
+.onb .tag{text-align:center;color:var(--muted);margin:8px 0 28px;line-height:1.5}
+.onb .stack{display:flex;flex-direction:column;gap:12px}
+.or{text-align:center;color:var(--muted);font-size:13px;margin:6px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="layer"></div>
+
+<script>
+// ------------------------------------------------------------------ config
+const CFG = { url: 'https://ndmkdkvtpbbsiawnuwuv.supabase.co', key: 'sb_publishable_Lu-_StyBdRFy0Jd5VCmPdw_fiKeeX8m' };
+const FN = CFG.url + '/functions/v1/sankalp';
+const COLORS = ['#E8650F', '#2F7FD8', '#2F9E5B', '#9B4DCA', '#D9483B', '#C08A12'];
+
+// ------------------------------------------------------------------ the text
+const CHALISA = {
+  open: ['श्रीगुरु चरन सरोज रज, निज मनु मुकुरु सुधारि।', 'बरनउँ रघुबर बिमल जसु, जो दायकु फल चारि॥', 'बुद्धिहीन तनु जानिके, सुमिरौं पवन-कुमार।', 'बल बुधि बिद्या देहु मोहिं, हरहु कलेस बिकार॥'],
+  verses: [
+    'जय हनुमान ज्ञान गुन सागर। जय कपीस तिहुँ लोक उजागर॥',
+    'राम दूत अतुलित बल धामा। अंजनि-पुत्र पवनसुत नामा॥',
+    'महाबीर बिक्रम बजरंगी। कुमति निवार सुमति के संगी॥',
+    'कंचन बरन बिराज सुबेसा। कानन कुंडल कुंचित केसा॥',
+    'हाथ बज्र औ ध्वजा बिराजै। काँधे मूँज जनेऊ साजै॥',
+    'संकर सुवन केसरीनंदन। तेज प्रताप महा जग बंदन॥',
+    'बिद्यावान गुनी अति चातुर। राम काज करिबे को आतुर॥',
+    'प्रभु चरित्र सुनिबे को रसिया। राम लखन सीता मन बसिया॥',
+    'सूक्ष्म रूप धरि सियहिं दिखावा। बिकट रूप धरि लंक जरावा॥',
+    'भीम रूप धरि असुर सँहारे। रामचंद्र के काज सँवारे॥',
+    'लाय सजीवन लखन जियाये। श्रीरघुबीर हरषि उर लाये॥',
+    'रघुपति कीन्ही बहुत बड़ाई। तुम मम प्रिय भरतहि सम भाई॥',
+    'सहस बदन तुम्हरो जस गावैं। अस कहि श्रीपति कंठ लगावैं॥',
+    'सनकादिक ब्रह्मादि मुनीसा। नारद सारद सहित अहीसा॥',
+    'जम कुबेर दिगपाल जहाँ ते। कबि कोबिद कहि सके कहाँ ते॥',
+    'तुम उपकार सुग्रीवहिं कीन्हा। राम मिलाय राज पद दीन्हा॥',
+    'तुम्हरो मंत्र बिभीषन माना। लंकेस्वर भए सब जग जाना॥',
+    'जुग सहस्र जोजन पर भानू। लील्यो ताहि मधुर फल जानू॥',
+    'प्रभु मुद्रिका मेलि मुख माहीं। जलधि लाँघि गये अचरज नाहीं॥',
+    'दुर्गम काज जगत के जेते। सुगम अनुग्रह तुम्हरे तेते॥',
+    'राम दुआरे तुम रखवारे। होत न आज्ञा बिनु पैसारे॥',
+    'सब सुख लहै तुम्हारी सरना। तुम रच्छक काहू को डर ना॥',
+    'आपन तेज सम्हारो आपै। तीनों लोक हाँक तें काँपै॥',
+    'भूत पिसाच निकट नहिं आवै। महाबीर जब नाम सुनावै॥',
+    'नासै रोग हरै सब पीरा। जपत निरंतर हनुमत बीरा॥',
+    'संकट तें हनुमान छुड़ावै। मन क्रम बचन ध्यान जो लावै॥',
+    'सब पर राम तपस्वी राजा। तिन के काज सकल तुम साजा॥',
+    'और मनोरथ जो कोई लावै। सोइ अमित जीवन फल पावै॥',
+    'चारों जुग परताप तुम्हारा। है परसिद्ध जगत उजियारा॥',
+    'साधु संत के तुम रखवारे। असुर निकंदन राम दुलारे॥',
+    'अष्ट सिद्धि नौ निधि के दाता। अस बर दीन जानकी माता॥',
+    'राम रसायन तुम्हरे पासा। सदा रहो रघुपति के दासा॥',
+    'तुम्हरे भजन राम को पावै। जनम जनम के दुख बिसरावै॥',
+    'अंत काल रघुबर पुर जाई। जहाँ जन्म हरि-भक्त कहाई॥',
+    'और देवता चित्त न धरई। हनुमत सेइ सर्ब सुख करई॥',
+    'संकट कटै मिटै सब पीरा। जो सुमिरै हनुमत बलबीरा॥',
+    'जय जय जय हनुमान गोसाईं। कृपा करहु गुरुदेव की नाईं॥',
+    'जो सत बार पाठ कर कोई। छूटहि बंदि महा सुख होई॥',
+    'जो यह पढ़ै हनुमान चालीसा। होय सिद्धि साखी गौरीसा॥',
+    'तुलसीदास सदा हरि चेरा। कीजै नाथ हृदय महँ डेरा॥',
+  ],
+  close: ['पवनतनय संकट हरन, मंगल मूरति रूप।', 'राम लखन सीता सहित, हृदय बसहु सुर भूप॥'],
+};
+// Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
+function toTelugu(s) {
+  return s.replace(/[ऀ-ॿ]/g, (ch) => {
+    if (ch === '़') return '';            // nukta
+    if (ch === '।' || ch === '॥') return ch;   // dandas are shared
+    if (ch === '\u0901') return 'ం';          // chandrabindu → anusvara (Telugu convention)
+    return String.fromCharCode(ch.charCodeAt(0) + 0x300);
+  });
+}
+
+// ------------------------------------------------------------------ sadhana catalogue
+const KINDS = {
+  chalisa: { title: 'Hanuman Chalisa', unit: 'paath', emoji: '🚩', reader: true, plans: [
+    { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
+    { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
+    { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
+    { n: 'Mahasadhana', days: 108, count: 1, d: '1 paath a day · 108 days' },
+  ] },
+  sundarkand: { title: 'Sundarkand', unit: 'paath', emoji: '📿', plans: [
+    { n: '11 days', days: 11, count: 1, d: '1 paath a day' }, { n: '21 days', days: 21, count: 1, d: '1 paath a day' },
+    { n: '40 days', days: 40, count: 1, d: '1 paath a day' }, { n: '7 days', days: 7, count: 1, d: '1 paath a day' },
+  ] },
+  bajrang: { title: 'Bajrang Baan', unit: 'paath', emoji: '🏹', plans: [
+    { n: '21 days', days: 21, count: 1, d: '1 paath a day' }, { n: '41 days', days: 41, count: 1, d: '1 paath a day' },
+    { n: '21 × 3', days: 21, count: 3, d: '3 paaths a day' }, { n: '11 days', days: 11, count: 1, d: '1 paath a day' },
+  ] },
+  japa: { title: 'Om Shri Hanumate Namah', unit: 'mala', emoji: '🕉️', plans: [
+    { n: '40 days', days: 40, count: 1, d: '1 mala (108) a day' }, { n: '21 days', days: 21, count: 3, d: '3 malas a day' },
+    { n: '41 days', days: 41, count: 11, d: '11 malas a day' }, { n: '11 days', days: 11, count: 1, d: '1 mala a day' },
+  ] },
+  custom: { title: '', unit: 'times', emoji: '✨', plans: [
+    { n: '11 days', days: 11, count: 1, d: '1 a day' }, { n: '21 days', days: 21, count: 1, d: '1 a day' },
+    { n: '40 days', days: 40, count: 1, d: '1 a day' }, { n: '108 days', days: 108, count: 1, d: '1 a day' },
+  ] },
+};
+const kindOf = (s) => KINDS[s.kind] || KINDS.custom;
+
+// ------------------------------------------------------------------ storage + state
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('sk.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('sk.' + k, JSON.stringify(v)); } catch {} },
+};
+const S = {
+  family: LS.get('family', null),
+  me: LS.get('me', null),
+  data: LS.get('data', { members: [], sadhanas: [], logs: [] }),
+  outbox: LS.get('outbox', []),
+  script: LS.get('script', 'dev'),
+  fs: LS.get('fs', 22),
+  tab: 'today', flushing: false, lastSync: null, syncErr: false,
+};
+let sb = null;
+function client() {
+  if (!S.family || !window.supabase) return null;
+  if (!sb || sb._fam !== S.family) {
+    sb = window.supabase.createClient(CFG.url, CFG.key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { 'x-family-code': S.family } },
+    });
+    sb._fam = S.family;
+  }
+  return sb;
+}
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+function newCode() {
+  const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', b = new Uint8Array(12); crypto.getRandomValues(b);
+  const s = [...b].map((x) => A[x % A.length]).join('');
+  return `SK-${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8)}`;
+}
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// ------------------------------------------------------------------ dates (device-local)
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const today = () => iso(new Date());
+const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); };
+const diff = (a, b) => { const p = (s) => { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d); }; return Math.round((p(b) - p(a)) / 864e5); };
+const fmt = (s, o = { weekday: 'short', day: 'numeric', month: 'short' }) => parse(s).toLocaleDateString('en-IN', o);
+const hm = (t) => { if (!t) return ''; const [h, m] = t.split(':').map(Number); const d = new Date(); d.setHours(h, m); return d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }); };
+
+// ------------------------------------------------------------------ sadhana maths
+const me = () => S.data.members.find((m) => m.id === S.me);
+const member = (id) => S.data.members.find((m) => m.id === id) || { name: '?', color: '#999' };
+const logOf = (sid, date) => S.data.logs.find((l) => l.sadhana_id === sid && l.log_date === date)?.count || 0;
+const exc = (s) => s.excused_dates || [];
+const span = (s) => s.total_days + exc(s).length;
+const endDate = (s) => addDays(s.start_date, span(s) - 1);
+function dayNo(s, date) {
+  const k = diff(s.start_date, date);
+  if (k < 0 || k >= span(s) || exc(s).includes(date)) return null;
+  return k + 1 - exc(s).filter((d) => d < date).length;
+}
+function dayStates(s) {
+  const t = today(), out = [];
+  for (let i = 0; i < span(s); i++) {
+    const d = addDays(s.start_date, i); let st;
+    if (exc(s).includes(d)) st = 'excused';
+    else {
+      const c = logOf(s.id, d);
+      if (c >= s.daily_target) st = 'done';
+      else if (d > t) st = 'future';
+      else if (d === t) st = c > 0 ? 'partial-today' : 'today';
+      else st = c > 0 ? 'partial' : 'missed';
+    }
+    out.push({ d, st });
+  }
+  return out;
+}
+const missedDates = (s) => s.status !== 'active' ? [] : dayStates(s).filter((x) => x.st === 'missed' || x.st === 'partial').map((x) => x.d);
+const doneCount = (s) => dayStates(s).filter((x) => x.st === 'done').length;
+const isRunning = (s, t = today()) => s.status === 'active' && diff(s.start_date, t) >= 0 && diff(s.start_date, t) < span(s);
+const isUpcoming = (s, t = today()) => s.status === 'active' && diff(s.start_date, t) < 0;
+
+// ------------------------------------------------------------------ sync
+function save() { LS.set('data', S.data); }
+function queue(op) {
+  // collapse repeated writes to the same row so rapid taps send one request
+  const from = S.flushing ? 1 : 0;
+  const i = S.outbox.findIndex((o, idx) => idx >= from && o.key && o.key === op.key);
+  if (i >= 0) S.outbox[i] = op; else S.outbox.push(op);
+  LS.set('outbox', S.outbox);
+  renderSync(); flush();
+}
+async function flush() {
+  const c = client();
+  if (!c || S.flushing || !S.outbox.length || !navigator.onLine) return;
+  S.flushing = true; renderSync();
+  try {
+    while (S.outbox.length) {
+      const op = S.outbox[0]; let r;
+      if (op.t === 'upsert') r = await c.from(op.table).upsert(op.row, op.conflict ? { onConflict: op.conflict } : undefined);
+      else if (op.t === 'update') r = await c.from(op.table).update(op.row).eq('id', op.id);
+      else if (op.t === 'delete') r = await c.from(op.table).delete().eq('id', op.id);
+      if (r && r.error) {
+        if (!r.error.code || /fetch|network/i.test(r.error.message || '')) { S.syncErr = true; break; } // offline: retry later
+        console.warn('dropped write', op, r.error);
+      }
+      S.syncErr = false;
+      S.outbox.shift(); LS.set('outbox', S.outbox);
+    }
+  } catch (e) { S.syncErr = true; } finally { S.flushing = false; renderSync(); }
+}
+async function pull() {
+  const c = client(); if (!c || !navigator.onLine) return;
+  await flush(); if (S.outbox.length) return;
+  try {
+    const [m, s, l] = await Promise.all([
+      c.from('sk_members').select('*').order('created_at'),
+      c.from('sk_sadhanas').select('*').order('created_at'),
+      c.from('sk_logs').select('sadhana_id,log_date,member_id,count'),
+    ]);
+    if (m.error || s.error || l.error) throw (m.error || s.error || l.error);
+    if (S.outbox.length) return; // a tap happened mid-fetch; next pull will catch up
+    S.data = { members: m.data, sadhanas: s.data, logs: l.data };
+    S.lastSync = Date.now(); S.syncErr = false; save();
+    autoComplete();
+    render();
+  } catch (e) { S.syncErr = true; renderSync(); }
+}
+const callFn = (body) => fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key }, body: JSON.stringify(body) }).then((r) => r.json());
+
+// ------------------------------------------------------------------ writes
+function setCount(s, date, n) {
+  n = Math.max(0, n);
+  const row = { sadhana_id: s.id, log_date: date, family_code: S.family, member_id: s.member_id, count: n, updated_at: new Date().toISOString() };
+  const i = S.data.logs.findIndex((l) => l.sadhana_id === s.id && l.log_date === date);
+  if (i >= 0) S.data.logs[i] = row; else S.data.logs.push(row);
+  save();
+  queue({ t: 'upsert', table: 'sk_logs', row, conflict: 'sadhana_id,log_date', key: 'log:' + s.id + ':' + date });
+}
+function updateSadhana(s, patch) {
+  Object.assign(s, patch, { updated_at: new Date().toISOString() }); save();
+  queue({ t: 'update', table: 'sk_sadhanas', id: s.id, row: { ...patch, updated_at: s.updated_at } });
+}
+function tap(id, delta) {
+  const s = S.data.sadhanas.find((x) => x.id === id); if (!s) return;
+  const t = today(); const before = logOf(s.id, t); const after = Math.max(0, before + delta);
+  if (after === before) return;
+  setCount(s, t, after);
+  if (navigator.vibrate) navigator.vibrate(delta > 0 ? 18 : [8, 40, 8]);
+  if (delta > 0 && before < s.daily_target && after >= s.daily_target) dayComplete(s);
+  render();
+}
+function dayComplete(s) {
+  const n = dayNo(s, today());
+  if (navigator.vibrate) navigator.vibrate([30, 60, 30, 60, 80]);
+  const last = doneCount(s) >= s.total_days;
+  celebrate(last ? 'Sankalp complete! 🙏' : `Day ${n} complete`, last ? `${s.total_days} days of ${s.title}` : 'Jai Shri Ram');
+  callFn({ action: 'cheer', family_code: S.family, member_id: S.me,
+    title: last ? `🎉 ${me()?.name} completed the sankalp!` : `🚩 ${me()?.name} finished today's ${s.title}`,
+    body: last ? `${s.total_days} days of ${s.title}. Jai Hanuman!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
+  if (last) updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
+}
+function autoComplete() {
+  S.data.sadhanas.filter((s) => s.member_id === S.me && s.status === 'active').forEach((s) => {
+    if (doneCount(s) >= s.total_days) updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
+  });
+}
+
+// ------------------------------------------------------------------ UI helpers
+function toast(msg, ms = 2600) {
+  const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
+  document.body.appendChild(el); setTimeout(() => el.remove(), ms);
+}
+function celebrate(title, sub) {
+  const b = document.createElement('div'); b.className = 'burst';
+  const icons = ['🌼', '🌸', '🪔', '🚩', '✨', '🌺'];
+  for (let i = 0; i < 26; i++) {
+    const sp = document.createElement('span'); sp.textContent = icons[i % icons.length];
+    sp.style.left = '50%'; sp.style.top = '45%';
+    sp.style.setProperty('--x', (Math.random() * 360 - 180) + 'px');
+    sp.style.setProperty('--y', (Math.random() * -380 + 60) + 'px');
+    sp.style.setProperty('--r', (Math.random() * 360) + 'deg');
+    sp.style.animationDelay = (Math.random() * .2) + 's';
+    b.appendChild(sp);
+  }
+  const m = document.createElement('div'); m.className = 'center-msg';
+  m.innerHTML = `<div>${esc(title)}<small>${esc(sub)}</small></div>`;
+  document.body.append(b, m); setTimeout(() => { b.remove(); m.remove(); }, 1900);
+}
+const avatar = (m, size = 38) => `<div class="av" style="background:${esc(m.color)};width:${size}px;height:${size}px">${esc((m.name || '?')[0].toUpperCase())}</div>`;
+function ringSvg(frac, done) {
+  const r = 80, c = 2 * Math.PI * r;
+  return `<svg viewBox="0 0 168 168"><circle cx="84" cy="84" r="${r}" fill="none" stroke="var(--line)" stroke-width="7"/>
+  <circle cx="84" cy="84" r="${r}" fill="none" stroke="${done ? 'var(--ok)' : 'var(--saffron)'}" stroke-width="7" stroke-linecap="round"
+   stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - Math.min(1, frac))}" style="transition:stroke-dashoffset .3s"/></svg>`;
+}
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const pushOn = () => pushSupported() && Notification.permission === 'granted' && LS.get('pushOn', false);
+
+// ------------------------------------------------------------------ render
+function render() {
+  const app = document.getElementById('app');
+  if (!S.family || !S.me || !me()) { app.innerHTML = onboarding(); return; }
+  const body = S.tab === 'today' ? viewToday() : S.tab === 'history' ? viewHistory() : viewSettings();
+  app.innerHTML = `<div class="wrap">${header()}${body}</div>
+  ${S.tab !== 'settings' ? `<button class="fab" data-act="new" aria-label="New sadhana">+</button>` : ''}
+  <nav class="tabs"><div class="in">
+    ${tabBtn('today', 'Today', '<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>')}
+    ${tabBtn('history', 'Sadhanas', '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>')}
+    ${tabBtn('settings', 'Settings', '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>')}
+  </div></nav>`;
+}
+const tabBtn = (id, label, path) => `<button class="${S.tab === id ? 'on' : ''}" data-act="tab" data-id="${id}">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</button>`;
+function header() {
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'Brahma muhurta' : h < 12 ? 'Suprabhatam' : h < 17 ? 'Namaste' : 'Shubh sandhya';
+  return `<div class="top"><img src="icons/icon-192.png" alt="">
+    <div><h1>${S.tab === 'today' ? `${greet}, ${esc(me().name)}` : S.tab === 'history' ? 'Sadhanas' : 'Settings'}</h1>
+    <div class="sub">${fmt(today(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
+    <div class="sync" id="sync">${syncHtml()}</div></div>`;
+}
+function syncHtml() {
+  if (!navigator.onLine) return `<span class="dot off"></span>Offline`;
+  if (S.outbox.length || S.flushing) return `<span class="dot wait"></span>Saving`;
+  if (S.syncErr) return `<span class="dot off"></span>Retry`;
+  return `<span class="dot"></span>Synced`;
+}
+function renderSync() { const el = document.getElementById('sync'); if (el) el.innerHTML = syncHtml(); }
+
+function viewToday() {
+  const t = today();
+  const mine = S.data.sadhanas.filter((s) => s.member_id === S.me);
+  const running = mine.filter((s) => isRunning(s, t));
+  const upcoming = mine.filter((s) => isUpcoming(s, t));
+  let html = '';
+  if (!pushOn() && !LS.get('pushDismissed', false)) {
+    html += `<div class="banner"><b>🔔 Turn on reminders</b>${isIOS && !standalone()
+      ? 'On iPhone, first tap <b style="display:inline">Share → Add to Home Screen</b>, open Sankalp from the home screen, then enable here.'
+      : 'Get a nudge at your chosen time, and know when your brother finishes his paath.'}
+      <div class="actions"><button class="btn primary sm" data-act="push">Enable</button><button class="btn line sm" data-act="push-later">Later</button></div></div>`;
+  }
+  // missed-day prompts
+  mine.filter((s) => s.status === 'active' && diff(s.start_date, t) > 0).forEach((s) => {
+    const md = missedDates(s).filter((d) => d < t);
+    if (!md.length) return;
+    html += `<div class="banner miss"><b>${esc(s.title)}: ${md.length === 1 ? `Day missed — ${fmt(md[0])}` : `${md.length} days incomplete`}</b>
+      Traditionally an anushthan restarts after a break. You choose:
+      <div class="actions">
+        <button class="btn sm line" data-act="fix-log" data-id="${s.id}">I did it, just forgot to log</button>
+        <button class="btn sm line" data-act="extend" data-id="${s.id}">Continue, add ${md.length === 1 ? 'a day' : md.length + ' days'} at the end</button>
+        <button class="btn sm danger" data-act="restart" data-id="${s.id}">Restart from Day 1</button>
+      </div></div>`;
+  });
+  if (!running.length && !upcoming.length) {
+    html += `<div class="card empty"><img src="icons/icon-192.png" alt=""><h3>Begin a sankalp</h3>
+      <p>Pick a sadhana, choose how many days, and a start day — Tuesday or Saturday is traditional for Hanumanji.</p>
+      <button class="btn primary" data-act="new">Start Hanuman Chalisa</button></div>`;
+  }
+  running.forEach((s) => { html += todayCard(s, t); });
+  if (upcoming.length) {
+    html += `<h2>Starting soon</h2>`;
+    upcoming.forEach((s) => {
+      const n = diff(t, s.start_date);
+      html += `<div class="card"><div class="sd-head"><div><div class="sd-title">${kindOf(s).emoji} ${esc(s.title)}</div>
+      <div class="sd-meta">${s.total_days} days · ${s.daily_target} ${esc(s.unit)}/day</div></div>
+      <span class="pill">${n === 1 ? 'Tomorrow' : 'In ' + n + ' days'}</span></div>
+      <div class="sd-meta" style="margin-top:10px">Begins ${fmt(s.start_date, { weekday: 'long', day: 'numeric', month: 'long' })}${s.reminder_time ? ' · reminder ' + hm(s.reminder_time) : ''}</div>
+      ${s.sankalp ? `<div class="sd-meta" style="margin-top:6px;font-style:italic">“${esc(s.sankalp)}”</div>` : ''}</div>`;
+    });
+  }
+  // family
+  const others = S.data.members.filter((m) => m.id !== S.me);
+  html += `<h2>Family today</h2><div class="card">`;
+  if (!others.length) {
+    html += `<div class="muted" style="font-size:14px;line-height:1.5">Invite your brother so you can see each other's progress.</div>
+      <div class="actions"><button class="btn sm primary" data-act="invite">Invite</button></div>`;
+  } else {
+    others.forEach((m) => {
+      const ss = S.data.sadhanas.filter((s) => s.member_id === m.id && isRunning(s, t));
+      if (!ss.length) { html += `<div class="fam">${avatar(m)}<div class="t"><div class="n">${esc(m.name)}</div><div class="m">No active sadhana today</div></div></div>`; return; }
+      ss.forEach((s) => {
+        const c = logOf(s.id, t), done = c >= s.daily_target;
+        html += `<div class="fam">${avatar(m)}<div class="t"><div class="n">${esc(m.name)}</div>
+          <div class="m">${esc(s.title)} · Day ${dayNo(s, t) ?? '–'}/${s.total_days} · ${c}/${s.daily_target}</div></div>
+          <span class="check">${done ? '✅' : '⏳'}</span></div>`;
+      });
+    });
+  }
+  return html + `</div>`;
+}
+function todayCard(s, t) {
+  const c = logOf(s.id, t), done = c >= s.daily_target, n = dayNo(s, t);
+  const k = kindOf(s);
+  const remain = s.total_days - doneCount(s);
+  return `<div class="card">
+    <div class="sd-head"><div><div class="sd-title">${k.emoji} ${esc(s.title)}</div>
+    <div class="sd-meta">${s.daily_target} ${esc(s.unit)}${s.daily_target > 1 ? 's' : ''} a day${s.reminder_time ? ' · 🔔 ' + hm(s.reminder_time) : ''}</div></div>
+    <span class="pill ${done ? 'ok' : ''}">Day ${n} / ${s.total_days}</span></div>
+    ${s.sankalp ? `<div class="sd-meta" style="margin-top:8px;font-style:italic">“${esc(s.sankalp)}”</div>` : ''}
+    <div class="counter">
+      <div class="side"><button class="mini ghost" data-act="dec" data-id="${s.id}" aria-label="Undo">−</button></div>
+      <div class="ring ${done ? 'done' : ''}" data-act="inc" data-id="${s.id}" role="button" aria-label="Add one">
+        ${ringSvg(c / s.daily_target, done)}
+        <div class="inner"><div><div class="big">${done && s.daily_target === 1 ? '✓' : c}</div>
+        <div class="small">${done ? 'Done today' : `of ${s.daily_target} · tap +1`}</div></div></div></div>
+      <div class="side">${k.reader ? `<button class="mini" data-act="read" data-id="${s.id}" aria-label="Read">📖</button>` : `<button class="mini" data-act="fill" data-id="${s.id}" aria-label="Mark all">✓</button>`}</div>
+    </div>
+    <div class="hint">${done ? `🙏 ${remain > 0 ? remain + ' days to go' : 'Final day!'}` : k.reader ? 'Tap the circle after each paath, or 📖 to read along' : 'Tap after each ' + esc(s.unit) + ' · ✓ marks today complete'}</div>
+    <div class="dots">${dayStates(s).map((x) => `<i class="${x.st}" title="${fmt(x.d)}"></i>`).join('')}</div>
+  </div>`;
+}
+
+function viewHistory() {
+  const groups = S.data.members.slice().sort((a, b) => (a.id === S.me ? -1 : b.id === S.me ? 1 : 0));
+  let html = '';
+  groups.forEach((m) => {
+    const ss = S.data.sadhanas.filter((s) => s.member_id === m.id).sort((a, b) => b.start_date.localeCompare(a.start_date));
+    html += `<h2>${m.id === S.me ? 'Mine' : esc(m.name)}</h2>`;
+    if (!ss.length) { html += `<div class="card muted" style="font-size:14px">Nothing yet.</div>`; return; }
+    ss.forEach((s) => {
+      const st = s.status === 'completed' ? '<span class="pill ok">Completed</span>'
+        : s.status === 'broken' ? '<span class="pill" style="background:var(--missSoft);color:var(--miss)">Restarted</span>'
+        : s.status === 'stopped' ? '<span class="pill" style="background:var(--line);color:var(--muted)">Stopped</span>'
+        : isUpcoming(s) ? '<span class="pill">Upcoming</span>' : `<span class="pill">${doneCount(s)}/${s.total_days}</span>`;
+      html += `<div class="card"><div class="sd-head"><div><div class="sd-title">${kindOf(s).emoji} ${esc(s.title)}</div>
+        <div class="sd-meta">${fmt(s.start_date, { day: 'numeric', month: 'short', year: 'numeric' })} → ${fmt(endDate(s), { day: 'numeric', month: 'short' })} · ${s.daily_target} ${esc(s.unit)}/day</div></div>${st}</div>
+        <div class="dots">${dayStates(s).map((x) => `<i class="${x.st}" title="${fmt(x.d)}"></i>`).join('')}</div>
+        ${m.id === S.me ? `<div class="actions"><button class="btn sm line" data-act="edit" data-id="${s.id}">Edit</button></div>` : ''}</div>`;
+    });
+  });
+  return html + `<div class="muted" style="font-size:12px;display:flex;gap:14px;flex-wrap:wrap;margin:6px 4px">
+    <span><i class="legend" style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--saffron)"></i> done</span>
+    <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--miss)"></i> missed</span>
+    <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;border:1.5px dashed var(--muted)"></i> skipped & extended</span></div>`;
+}
+
+function viewSettings() {
+  const m = me();
+  const link = location.origin + location.pathname + '?join=' + encodeURIComponent(S.family);
+  return `<h2>You</h2><div class="card">
+    <div class="row">${avatar(m, 46)}<input id="myname" value="${esc(m.name)}" maxlength="30" style="flex:1"></div>
+    <div class="lbl" style="margin-top:14px">Colour</div>
+    <div class="chips">${COLORS.map((c) => `<button class="chip ${c === m.color ? 'on' : ''}" data-act="color" data-id="${c}" style="width:44px;height:44px;padding:0;background:${c}" aria-label="colour"></button>`).join('')}</div>
+    <div class="actions"><button class="btn sm primary" data-act="savename">Save</button></div></div>
+
+  <h2>Notifications</h2><div class="card">
+    ${!pushSupported() ? `<div class="muted" style="font-size:14px;line-height:1.5">${isIOS ? 'Add Sankalp to your Home Screen (Share → Add to Home Screen) and open it from there to enable notifications. Needs iOS 16.4+.' : 'This browser does not support push notifications.'}</div>`
+    : `<div class="toggle"><div><b>Reminders</b><div class="muted" style="font-size:13px">${pushOn() ? 'On for this phone' : 'Off'}</div></div>
+       <button class="sw ${pushOn() ? 'on' : ''}" data-act="${pushOn() ? 'push-off' : 'push'}" aria-label="toggle"></button></div>
+       ${pushOn() ? `<button class="btn sm line" data-act="push-test">Send a test notification</button>` : ''}`}
+    <div class="muted" style="font-size:13px;margin-top:12px;line-height:1.5">Reminder times are set per sadhana (Sadhanas → Edit). You'll also get a note when someone in the family completes their day.</div></div>
+
+  <h2>Family</h2><div class="card">
+    ${S.data.members.map((x) => `<div class="fam">${avatar(x)}<div class="t"><div class="n">${esc(x.name)}${x.id === S.me ? ' <span class="muted">(you)</span>' : ''}</div></div></div>`).join('')}
+    <div class="lbl">Family code</div><div class="code">${esc(S.family)}</div>
+    <div class="actions"><button class="btn sm primary" data-act="invite">Share invite link</button>
+    <button class="btn sm line" data-act="copy" data-id="${esc(link)}">Copy link</button></div></div>
+
+  <h2>Reading</h2><div class="card"><div class="toggle"><b>Chalisa script</b>
+    <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="script" data-id="dev">देवनागरी</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="script" data-id="tel">తెలుగు</button></div></div></div>
+
+  <h2>Device</h2><div class="card">
+    <button class="btn sm line" data-act="refresh">Sync now</button>
+    <button class="btn sm danger" data-act="logout" style="margin-left:6px">Switch person / family</button>
+    <div class="muted" style="font-size:12px;margin-top:12px">Sankalp v1 · data syncs between phones in your family only.</div></div>`;
+}
+
+// ------------------------------------------------------------------ onboarding
+function onboarding() {
+  const join = new URLSearchParams(location.search).get('join') || S.pendingJoin;
+  if (S.joinMembers) {
+    return `<div class="onb"><img class="logo" src="icons/icon-512.png" alt=""><h1>Who are you?</h1>
+      <p class="tag">Joining family <b>${esc(S.pendingJoin)}</b></p><div class="stack">
+      ${S.joinMembers.map((m) => `<button class="btn line block" data-act="pick-me" data-id="${m.id}" style="justify-content:flex-start">${avatar(m, 30)} ${esc(m.name)}</button>`).join('')}
+      <div class="or">— or I'm new —</div>
+      <input id="onb-name" placeholder="Your name" maxlength="30" autocomplete="given-name">
+      <button class="btn primary block" data-act="join-new">Join</button></div></div>`;
+  }
+  return `<div class="onb"><img class="logo" src="icons/icon-512.png" alt="">
+    <h1>Sankalp</h1><p class="tag">Hanuman Chalisa & sadhana tracker.<br>Keep your vow, day by day — together.</p>
+    <div class="stack">
+    ${join ? `<div class="banner" style="text-align:center">You've been invited to a family<br><b style="display:inline">${esc(join)}</b></div>
+      <button class="btn primary block" data-act="join" data-id="${esc(join)}">Continue</button>`
+    : `<input id="onb-name" placeholder="Your name" maxlength="30" autocomplete="given-name">
+      <button class="btn primary block" data-act="create">Start</button>
+      <div class="or">Have an invite code from your family?</div>
+      <input id="onb-code" placeholder="SK-XXXX-XXXX-XXXX" autocapitalize="characters">
+      <button class="btn line block" data-act="join-code">Join family</button>`}
+    </div></div>`;
+}
+async function createFamily() {
+  const name = document.getElementById('onb-name').value.trim();
+  if (!name) return toast('Please enter your name');
+  if (!navigator.onLine) return toast('Connect to the internet to set up');
+  S.family = newCode(); sb = null;
+  const c = client();
+  const f = await c.from('sk_families').insert({ code: S.family });
+  if (f.error) { S.family = null; return toast('Could not create: ' + f.error.message); }
+  const m = { id: uid(), family_code: S.family, name, color: COLORS[0], tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' };
+  const r = await c.from('sk_members').insert(m);
+  if (r.error) return toast('Could not create: ' + r.error.message);
+  LS.set('family', S.family); S.me = m.id; LS.set('me', m.id);
+  S.data = { members: [m], sadhanas: [], logs: [] }; save();
+  render(); openNew();
+}
+async function startJoin(code) {
+  code = (code || '').trim().toUpperCase();
+  if (!/^SK-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return toast('That code doesn’t look right');
+  S.family = code; sb = null;
+  const c = client();
+  const f = await c.from('sk_families').select('code').maybeSingle();
+  if (f.error || !f.data) { S.family = null; return toast('Family not found — check the code'); }
+  const m = await c.from('sk_members').select('*').order('created_at');
+  S.pendingJoin = code; S.joinMembers = m.data || [];
+  render();
+}
+function finishJoin(memberId) {
+  LS.set('family', S.family); S.me = memberId; LS.set('me', memberId);
+  S.joinMembers = null; S.pendingJoin = null;
+  history.replaceState(null, '', location.pathname);
+  render(); pull();
+}
+async function joinNew() {
+  const name = document.getElementById('onb-name').value.trim();
+  if (!name) return toast('Please enter your name');
+  const used = S.joinMembers.map((m) => m.color);
+  const m = { id: uid(), family_code: S.family, name, color: COLORS.find((c) => !used.includes(c)) || COLORS[1], tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' };
+  const r = await client().from('sk_members').insert(m);
+  if (r.error) return toast('Could not join: ' + r.error.message);
+  S.data.members = [...S.joinMembers, m]; finishJoin(m.id);
+}
+
+// ------------------------------------------------------------------ new / edit sheet
+function nextWeekday(dow) { const d = new Date(); const k = (dow - d.getDay() + 7) % 7 || 7; d.setDate(d.getDate() + k); return iso(d); }
+function openNew() {
+  const p = KINDS.chalisa.plans[0];
+  S.form = { mode: 'new', kind: 'chalisa', title: KINDS.chalisa.title, unit: 'paath', plan: 0, days: p.days, count: p.count,
+    start: new Date().getDay() === 2 || new Date().getDay() === 6 ? today() : nextWeekday(2), sankalp: '',
+    reminder: '06:00', nudgeOn: true, nudge: '21:00', who: [S.me] };
+  openSheet();
+}
+function openEdit(id) {
+  const s = S.data.sadhanas.find((x) => x.id === id);
+  S.form = { mode: 'edit', id, title: s.title, sankalp: s.sankalp || '', reminder: (s.reminder_time || '').slice(0, 5),
+    nudgeOn: !!s.nudge_time, nudge: (s.nudge_time || '21:00').slice(0, 5), status: s.status };
+  openSheet();
+}
+function openSheet() { document.getElementById('layer').innerHTML = `<div class="sheet-bg" data-act="sheet-bg"><div class="sheet">${sheetHtml()}</div></div>`; }
+function rerenderSheet() { const sh = document.querySelector('.sheet'); if (sh) { const y = sh.scrollTop; sh.innerHTML = sheetHtml(); sh.scrollTop = y; } }
+function closeSheet() { document.getElementById('layer').innerHTML = ''; S.form = null; }
+function sheetHtml() {
+  const f = S.form;
+  if (f.mode === 'edit') {
+    return `<div class="grab"></div><h3>Edit sadhana</h3>
+      <div class="lbl">Name</div><input data-f="title" value="${esc(f.title)}" maxlength="50">
+      <div class="lbl">Sankalp (intention)</div><textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional">${esc(f.sankalp)}</textarea>
+      ${remindersHtml()}
+      <div class="actions" style="margin-top:22px"><button class="btn primary block" data-act="save-edit">Save</button></div>
+      ${f.status === 'active' ? `<div class="actions"><button class="btn line sm" data-act="stop">Stop this sadhana</button></div>` : ''}
+      <div class="actions"><button class="btn danger sm" data-act="delete">Delete permanently</button></div>`;
+  }
+  const k = KINDS[f.kind];
+  const tue = nextWeekday(2), sat = nextWeekday(6), t = today();
+  const starts = [[t, 'Today'], [tue, fmt(tue) + ' ★'], [sat, fmt(sat) + ' ★']].filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i);
+  const others = S.data.members.filter((m) => m.id !== S.me);
+  return `<div class="grab"></div><h3>New sankalp</h3>
+    <div class="muted" style="font-size:14px">Choose the sadhana, the length, and when to begin.</div>
+    <div class="lbl">Sadhana</div><div class="chips">
+      ${Object.entries(KINDS).map(([id, x]) => `<button class="chip ${f.kind === id ? 'on' : ''}" data-act="kind" data-id="${id}">${x.emoji} ${id === 'custom' ? 'Other' : esc(x.title)}</button>`).join('')}</div>
+    ${f.kind === 'custom' ? `<div class="two" style="margin-top:10px"><div><label>Name</label><input data-f="title" value="${esc(f.title)}" placeholder="e.g. Gayatri japa" maxlength="50"></div>
+      <div><label>Counted as</label><input data-f="unit" value="${esc(f.unit)}" placeholder="mala / paath" maxlength="12"></div></div>` : ''}
+    <div class="lbl">Plan</div><div class="plans">
+      ${k.plans.map((p, i) => `<button class="chip ${f.plan === i ? 'on' : ''}" data-act="plan" data-id="${i}">${esc(p.n)}<small>${esc(p.d)}</small></button>`).join('')}</div>
+    <div class="two" style="margin-top:10px"><div><label>Days</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div>
+      <div><label>${esc((f.unit || 'times').replace(/^./, (c) => c.toUpperCase()))}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div></div>
+    <div class="lbl">Start</div><div class="chips">
+      ${starts.map(([d, l]) => `<button class="chip ${f.start === d ? 'on' : ''}" data-act="start" data-id="${d}">${l}</button>`).join('')}
+      <input data-f="start" type="date" value="${f.start}" style="width:auto;flex:1;min-width:150px"></div>
+    <div class="muted" style="font-size:12px;margin:6px 2px">★ Tuesday & Saturday are Hanumanji's days. Ends ${fmt(addDays(f.start, (+f.days || 1) - 1), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}.</div>
+    <div class="lbl">Sankalp (intention)</div>
+    <textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional — what you dedicate this sadhana to">${esc(f.sankalp)}</textarea>
+    ${remindersHtml()}
+    ${others.length ? `<div class="lbl">Who is doing this?</div><div class="chips">
+      ${S.data.members.map((m) => `<button class="chip ${f.who.includes(m.id) ? 'on' : ''}" data-act="who" data-id="${m.id}">${m.id === S.me ? 'Me' : esc(m.name)}</button>`).join('')}</div>
+      <div class="muted" style="font-size:12px;margin:6px 2px">Each person gets their own tracker and reminders.</div>` : ''}
+    ${guideHtml()}
+    <div class="actions" style="margin-top:20px"><button class="btn primary block" data-act="create-sadhana">Take the sankalp 🙏</button></div>`;
+}
+function remindersHtml() {
+  const f = S.form;
+  return `<div class="lbl">Reminders</div>
+    <div class="two"><div><label>Daily reminder</label><input data-f="reminder" type="time" value="${f.reminder}"></div>
+    <div><label>If not done by</label><input data-f="nudge" type="time" value="${f.nudge}" ${f.nudgeOn ? '' : 'disabled'}></div></div>
+    <div class="toggle"><span style="font-size:14px">Evening nudge if pending</span><button class="sw ${f.nudgeOn ? 'on' : ''}" data-act="nudge-toggle" aria-label="toggle"></button></div>`;
+}
+function guideHtml() {
+  return `<details class="guide"><summary>How to begin a sadhana</summary><ul>
+    <li>Start on a Tuesday or Saturday — ideally in Shukla Paksha (waxing moon).</li>
+    <li>On Day 1, sit before Hanumanji's picture, light a diya and take your sankalp: state your name, the count, the days and your intention.</li>
+    <li>Recite at the same time and place daily. Brahma muhurta or after the morning bath is best; before sleep also works.</li>
+    <li>Common plans: 7 or 11 paaths daily for 21 days, 11 daily for 41 days, or once daily for a 40-day mandala.</li>
+    <li>Keep the food sattvic — no meat or alcohol during the sadhana.</li>
+    <li>If a day is missed, many traditions restart from Day 1. The app lets you choose.</li>
+    <li>On the last day, offer prasad (boondi / gud-chana), visit a Hanuman temple if you can, and feed someone.</li>
+  </ul></details>`;
+}
+function readForm() {
+  document.querySelectorAll('.sheet [data-f]').forEach((el) => { S.form[el.dataset.f] = el.value; });
+}
+function createSadhanas() {
+  readForm(); const f = S.form;
+  const days = Math.round(+f.days), count = Math.round(+f.count);
+  const title = (f.title || '').trim();
+  if (!title) return toast('Give the sadhana a name');
+  if (!(days >= 1 && days <= 1000)) return toast('Days should be 1–1000');
+  if (!(count >= 1 && count <= 10000)) return toast('Count per day should be at least 1');
+  if (!f.start) return toast('Pick a start date');
+  const now = new Date().toISOString();
+  f.who.forEach((mid) => {
+    const s = { id: uid(), family_code: S.family, member_id: mid, kind: f.kind, title, unit: (f.unit || 'times').trim(),
+      daily_target: count, total_days: days, start_date: f.start, excused_dates: [], reminder_time: f.reminder || null,
+      nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, sankalp: f.sankalp.trim() || null, status: 'active', created_at: now, updated_at: now };
+    S.data.sadhanas.push(s);
+    queue({ t: 'upsert', table: 'sk_sadhanas', row: s, key: 'sd:' + s.id });
+  });
+  save(); closeSheet(); S.tab = 'today'; render();
+  toast(f.start === today() ? 'Sankalp taken. Day 1 begins now 🙏' : `Sankalp set — begins ${fmt(f.start)}`);
+  if (!pushOn() && pushSupported()) setTimeout(() => toast('Tip: enable reminders so you never miss a day'), 2800);
+}
+function saveEdit() {
+  readForm(); const f = S.form; const s = S.data.sadhanas.find((x) => x.id === f.id);
+  if (!f.title.trim()) return toast('Name can’t be empty');
+  updateSadhana(s, { title: f.title.trim(), sankalp: f.sankalp.trim() || null, reminder_time: f.reminder || null,
+    nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null });
+  closeSheet(); render(); toast('Saved');
+}
+
+// ------------------------------------------------------------------ reader
+function openReader(id) {
+  S.reader = id; const s = S.data.sadhanas.find((x) => x.id === id);
+  const tr = (x) => S.script === 'tel' ? toTelugu(x) : x;
+  const c = logOf(id, today());
+  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''}">
+    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${tr('श्री हनुमान चालीसा')}</div>
+      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
+      <button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></header>
+    <div class="body" id="rbody" style="font-size:${S.fs}px">
+      <div class="doha"><small>Doha</small>${CHALISA.open.map(tr).join('<br>')}</div>
+      ${CHALISA.verses.map((v, i) => `<div class="verse"><span class="no">${i + 1}</span><span class="tx">${tr(v).replace(/। /, '।<br>')}</span></div>`).join('')}
+      <div class="doha"><small>Doha</small>${CHALISA.close.map(tr).join('<br>')}</div>
+      <div class="doha" style="font-size:.85em">सियावर रामचंद्र की जय · पवनसुत हनुमान की जय</div>
+    </div>
+    <footer><button class="btn primary block" data-act="reader-done" style="padding:16px">✓ Paath complete · ${c + 1} of ${s.daily_target}</button></footer></div>`;
+}
+
+// ------------------------------------------------------------------ push
+function b64ToU8(s) { const p = '='.repeat((4 - s.length % 4) % 4); const b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...b].map((c) => c.charCodeAt(0))); }
+async function enablePush() {
+  if (!pushSupported()) { toast(isIOS ? 'First add Sankalp to your Home Screen, then open it from there' : 'Notifications not supported in this browser', 4200); return; }
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { toast('Notifications were blocked — allow them in your phone settings', 4000); return; }
+    const reg = await navigator.serviceWorker.ready;
+    const { publicKey } = await callFn({ action: 'vapid' });
+    let sub = await reg.pushManager.getSubscription();
+    if (sub && LS.get('vapid', null) !== publicKey) { await sub.unsubscribe(); sub = null; }
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(publicKey) });
+    LS.set('vapid', publicKey);
+    const j = sub.toJSON();
+    const r = await client().from('sk_push_subs').upsert({ endpoint: j.endpoint, family_code: S.family, member_id: S.me, p256dh: j.keys.p256dh, auth: j.keys.auth });
+    if (r.error) throw r.error;
+    LS.set('pushOn', true); render();
+    await callFn({ action: 'test', family_code: S.family, member_id: S.me });
+    toast('Reminders on 🔔');
+  } catch (e) { console.error(e); toast('Could not enable: ' + (e.message || e)); }
+}
+async function disablePush() {
+  try {
+    const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription();
+    if (sub) { await client().from('sk_push_subs').delete().eq('endpoint', sub.endpoint); await sub.unsubscribe(); }
+  } catch {}
+  LS.set('pushOn', false); render();
+}
+
+// ------------------------------------------------------------------ events
+document.addEventListener('click', async (e) => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  const sd = () => S.data.sadhanas.find((x) => x.id === id);
+  switch (act) {
+    case 'tab': S.tab = id; render(); scrollTo(0, 0); break;
+    case 'inc': tap(id, 1); break;
+    case 'dec': tap(id, -1); break;
+    case 'fill': { const s = sd(); tap(id, s.daily_target - logOf(id, today())); break; }
+    case 'read': openReader(id); break;
+    case 'close-reader': document.getElementById('layer').innerHTML = ''; S.reader = null; render(); break;
+    case 'reader-done': { const rid = S.reader; document.getElementById('layer').innerHTML = ''; S.reader = null; tap(rid, 1); break; }
+    case 'rscript': S.script = id; LS.set('script', id); openReader(S.reader); break;
+    case 'font': { S.fs = Math.min(34, Math.max(16, S.fs + +id)); LS.set('fs', S.fs); document.getElementById('rbody').style.fontSize = S.fs + 'px'; break; }
+    case 'script': S.script = id; LS.set('script', id); render(); break;
+    case 'new': openNew(); break;
+    case 'edit': openEdit(id); break;
+    case 'sheet-bg': if (e.target === el) closeSheet(); break;
+    case 'kind': { readForm(); const k = KINDS[id]; Object.assign(S.form, { kind: id, title: k.title, unit: k.unit, plan: 0, days: k.plans[0].days, count: k.plans[0].count }); rerenderSheet(); break; }
+    case 'plan': { readForm(); const p = KINDS[S.form.kind].plans[+id]; Object.assign(S.form, { plan: +id, days: p.days, count: p.count }); rerenderSheet(); break; }
+    case 'start': readForm(); S.form.start = id; rerenderSheet(); break;
+    case 'who': { readForm(); const w = S.form.who; S.form.who = w.includes(id) ? (w.length > 1 ? w.filter((x) => x !== id) : w) : [...w, id]; rerenderSheet(); break; }
+    case 'nudge-toggle': readForm(); S.form.nudgeOn = !S.form.nudgeOn; rerenderSheet(); break;
+    case 'create-sadhana': createSadhanas(); break;
+    case 'save-edit': saveEdit(); break;
+    case 'stop': if (confirm('Stop this sadhana? It stays in your history.')) { updateSadhana(S.data.sadhanas.find((x) => x.id === S.form.id), { status: 'stopped' }); closeSheet(); render(); } break;
+    case 'delete': if (confirm('Delete this sadhana and all its logs?')) {
+      const did = S.form.id; S.data.sadhanas = S.data.sadhanas.filter((x) => x.id !== did); S.data.logs = S.data.logs.filter((l) => l.sadhana_id !== did);
+      save(); queue({ t: 'delete', table: 'sk_sadhanas', id: did }); closeSheet(); render(); } break;
+    case 'fix-log': { const s = sd(); missedDates(s).filter((d) => d < today()).forEach((d) => setCount(s, d, s.daily_target)); autoComplete(); render(); toast('Logged 🙏'); break; }
+    case 'extend': { const s = sd(); const md = missedDates(s).filter((d) => d < today()); updateSadhana(s, { excused_dates: [...exc(s), ...md] }); render(); toast(`Extended — now ends ${fmt(endDate(s))}`); break; }
+    case 'restart': { const s = sd();
+      if (!confirm(`Restart ${s.title} from Day 1 today?`)) break;
+      updateSadhana(s, { status: 'broken' });
+      const now = new Date().toISOString();
+      const n = { ...s, id: uid(), start_date: today(), excused_dates: [], status: 'active', completed_at: null, last_reminded_on: null, last_nudged_on: null, created_at: now, updated_at: now };
+      S.data.sadhanas.push(n); save(); queue({ t: 'upsert', table: 'sk_sadhanas', row: n, key: 'sd:' + n.id }); render(); toast('Day 1 begins today. Jai Hanuman 🚩'); break; }
+    case 'push': enablePush(); break;
+    case 'push-off': disablePush(); break;
+    case 'push-later': LS.set('pushDismissed', true); render(); break;
+    case 'push-test': { const r = await callFn({ action: 'test', family_code: S.family, member_id: S.me }); toast(r.sent ? 'Sent — check your notifications' : 'No device registered — toggle reminders off and on'); break; }
+    case 'invite': {
+      const link = location.origin + location.pathname + '?join=' + encodeURIComponent(S.family);
+      const text = `Join me on Sankalp — our Hanuman Chalisa tracker 🚩\n${link}\n(Code: ${S.family})`;
+      if (navigator.share) navigator.share({ title: 'Sankalp', text }).catch(() => {});
+      else { navigator.clipboard?.writeText(text); toast('Invite copied — paste it to your brother'); }
+      break; }
+    case 'copy': navigator.clipboard?.writeText(id).then(() => toast('Link copied')); break;
+    case 'color': { const m = me(); m.color = id; save(); queue({ t: 'update', table: 'sk_members', id: m.id, row: { color: id } }); render(); break; }
+    case 'savename': { const v = document.getElementById('myname').value.trim(); if (!v) break; const m = me(); m.name = v; save(); queue({ t: 'update', table: 'sk_members', id: m.id, row: { name: v } }); render(); toast('Saved'); break; }
+    case 'refresh': await pull(); toast('Synced'); break;
+    case 'logout': if (confirm('Sign this phone out? Your data stays safe in the family. Keep your family code to rejoin.')) {
+      await disablePush(); ['family', 'me', 'data', 'outbox', 'pushOn', 'pushDismissed'].forEach((k) => localStorage.removeItem('sk.' + k));
+      S.family = null; S.me = null; S.data = { members: [], sadhanas: [], logs: [] }; S.outbox = []; sb = null; render(); } break;
+    case 'create': createFamily(); break;
+    case 'join': startJoin(id); break;
+    case 'join-code': startJoin(document.getElementById('onb-code').value); break;
+    case 'pick-me': finishJoin(id); break;
+    case 'join-new': joinNew(); break;
+  }
+});
+document.addEventListener('change', (e) => {
+  if (!S.form || !e.target.matches('.sheet [data-f]')) return;
+  readForm();
+  if (['days', 'count'].includes(e.target.dataset.f)) S.form.plan = -1;
+  if (['start', 'days', 'count', 'unit'].includes(e.target.dataset.f)) rerenderSheet();
+});
+
+// ------------------------------------------------------------------ boot
+window.addEventListener('online', () => { renderSync(); pull(); });
+window.addEventListener('offline', renderSync);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { pull(); if (S.tab === 'today' && !S.form && !S.reader) render(); } });
+setInterval(() => { if (document.visibilityState === 'visible' && !S.form) pull(); }, 30000);
+// re-render at midnight so the day rolls over
+let lastDay = today(); setInterval(() => { if (today() !== lastDay) { lastDay = today(); if (!S.form && !S.reader) render(); } }, 60000);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.addEventListener('message', (e) => { if (e.data?.type === 'refresh') pull(); });
+}
+render();
+pull();
+</script>
+</body>
+</html>
