@@ -1,8 +1,8 @@
 // Sankalp – push notifications for the sadhana tracker.
 // Actions (POST JSON {action, ...}):
 //   vapid  → { publicKey }
-//   test   → test push to one member            {family_code, member_id}
-//   cheer  → tell the rest of the family         {family_code, member_id, title, body}
+//   test   → test push to the signed-in member   (Authorization: Bearer <session>)
+//   cheer  → tell the rest of the family         {title, body} (Authorization: Bearer <session>)
 //   tick   → reminder sweep (pg_cron, needs x-cron-key header)
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -61,9 +61,14 @@ async function pushTo(memberIds: string[], payload: Record<string, unknown>) {
   return sent;
 }
 
-async function memberOk(family: string, member: string) {
-  const { data } = await db.from("sk_members").select("id").eq("id", member).eq("family_code", family).maybeSingle();
-  return !!data;
+// Resolve the signed-in user's member row from their Supabase session token.
+async function caller(req: Request) {
+  const token = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
+  if (!token) return null;
+  const { data } = await db.auth.getUser(token);
+  if (!data?.user) return null;
+  const { data: m } = await db.from("sk_members").select("id,family_code,name").eq("user_id", data.user.id).limit(1).maybeSingle();
+  return m;
 }
 
 // ---- date helpers (local to the member's time zone) ----
@@ -129,13 +134,15 @@ Deno.serve(async (req) => {
       case "vapid":
         return json({ publicKey: await vapid() });
       case "test": {
-        if (!(await memberOk(body.family_code, body.member_id))) return json({ error: "unknown member" }, 403);
-        const n = await pushTo([body.member_id], { title: "🔔 Notifications are on", body: "Jai Hanuman! Reminders will arrive here.", tag: "test", url: "./" });
+        const me = await caller(req);
+        if (!me) return json({ error: "sign in first" }, 401);
+        const n = await pushTo([me.id], { title: "🔔 Notifications are on", body: "Jai Hanuman! Reminders will arrive here.", tag: "test", url: "./" });
         return json({ sent: n });
       }
       case "cheer": {
-        if (!(await memberOk(body.family_code, body.member_id))) return json({ error: "unknown member" }, 403);
-        const { data: others } = await db.from("sk_members").select("id").eq("family_code", body.family_code).neq("id", body.member_id);
+        const me = await caller(req);
+        if (!me) return json({ error: "sign in first" }, 401);
+        const { data: others } = await db.from("sk_members").select("id").eq("family_code", me.family_code).neq("id", me.id);
         const n = await pushTo((others ?? []).map((o) => o.id), {
           title: String(body.title ?? "").slice(0, 80), body: String(body.body ?? "").slice(0, 160), tag: "cheer", url: "./",
         });

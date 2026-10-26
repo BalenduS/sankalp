@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Serif+Telugu:wght@500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="vendor/supabase.min.js"></script>
 <style>
 :root{
   --bg:#FFF7EC; --card:#FFFFFF; --ink:#2A1A0E; --muted:#8A7462; --line:#F0E2CF;
@@ -261,25 +261,17 @@ const S = {
   script: LS.get('script', 'dev'),
   fs: LS.get('fs', 22),
   tab: 'today', flushing: false, lastSync: null, syncErr: false,
+  user: null, authStep: 'email', authEmail: LS.get('authEmail', ''), booting: true,
 };
 let sb = null;
 function client() {
-  if (!S.family || !window.supabase) return null;
-  if (!sb || sb._fam !== S.family) {
-    sb = window.supabase.createClient(CFG.url, CFG.key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: { headers: { 'x-family-code': S.family } },
-    });
-    sb._fam = S.family;
-  }
+  if (!window.supabase) return null;
+  if (!sb) sb = window.supabase.createClient(CFG.url, CFG.key, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'sk.auth' },
+  });
   return sb;
 }
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
-function newCode() {
-  const A = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', b = new Uint8Array(12); crypto.getRandomValues(b);
-  const s = [...b].map((x) => A[x % A.length]).join('');
-  return `SK-${s.slice(0, 4)}-${s.slice(4, 8)}-${s.slice(8)}`;
-}
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 // ------------------------------------------------------------------ dates (device-local)
@@ -354,7 +346,7 @@ async function flush() {
   } catch (e) { S.syncErr = true; } finally { S.flushing = false; renderSync(); }
 }
 async function pull() {
-  const c = client(); if (!c || !navigator.onLine) return;
+  const c = client(); if (!c || !S.user || !S.family || !navigator.onLine) return;
   await flush(); if (S.outbox.length) return;
   try {
     const [m, s, l] = await Promise.all([
@@ -370,7 +362,12 @@ async function pull() {
     render();
   } catch (e) { S.syncErr = true; renderSync(); }
 }
-const callFn = (body) => fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key }, body: JSON.stringify(body) }).then((r) => r.json());
+async function callFn(body) {
+  const { data } = await client().auth.getSession();
+  const headers = { 'Content-Type': 'application/json', apikey: CFG.key };
+  if (data?.session) headers.Authorization = 'Bearer ' + data.session.access_token;
+  return fetch(FN, { method: 'POST', headers, body: JSON.stringify(body) }).then((r) => r.json());
+}
 
 // ------------------------------------------------------------------ writes
 function setCount(s, date, n) {
@@ -399,7 +396,7 @@ function dayComplete(s) {
   if (navigator.vibrate) navigator.vibrate([30, 60, 30, 60, 80]);
   const last = doneCount(s) >= s.total_days;
   celebrate(last ? 'Sankalp complete! 🙏' : `Day ${n} complete`, last ? `${s.total_days} days of ${s.title}` : 'Jai Shri Ram');
-  callFn({ action: 'cheer', family_code: S.family, member_id: S.me,
+  callFn({ action: 'cheer',
     title: last ? `🎉 ${me()?.name} completed the sankalp!` : `🚩 ${me()?.name} finished today's ${s.title}`,
     body: last ? `${s.total_days} days of ${s.title}. Jai Hanuman!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
   if (last) updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
@@ -446,7 +443,7 @@ const pushOn = () => pushSupported() && Notification.permission === 'granted' &&
 // ------------------------------------------------------------------ render
 function render() {
   const app = document.getElementById('app');
-  if (!S.family || !S.me || !me()) { app.innerHTML = onboarding(); return; }
+  if (!S.user || !S.family || !S.me || !me()) { app.innerHTML = onboarding(); return; }
   const body = S.tab === 'today' ? viewToday() : S.tab === 'history' ? viewHistory() : viewSettings();
   app.innerHTML = `<div class="wrap">${header()}${body}</div>
   ${S.tab !== 'settings' ? `<button class="fab" data-act="new" aria-label="New sadhana">+</button>` : ''}
@@ -480,7 +477,10 @@ function viewToday() {
   const running = mine.filter((s) => isRunning(s, t));
   const upcoming = mine.filter((s) => isUpcoming(s, t));
   let html = '';
-  if (!pushOn() && !LS.get('pushDismissed', false)) {
+  if (!standalone() && !LS.get('installDismissed', false)) {
+    html += `<div class="banner"><b>📲 Install Sankalp</b>Put it on your home screen — opens full screen and is needed for reminders on iPhone.
+      <div class="actions"><button class="btn primary sm" data-act="install">Install app</button><button class="btn line sm" data-act="install-later">Not now</button></div></div>`;
+  } else if (!pushOn() && !LS.get('pushDismissed', false)) {
     html += `<div class="banner"><b>🔔 Turn on reminders</b>${isIOS && !standalone()
       ? 'On iPhone, first tap <b style="display:inline">Share → Add to Home Screen</b>, open Sankalp from the home screen, then enable here.'
       : 'Get a nudge at your chosen time, and know when your brother finishes his paath.'}
@@ -606,75 +606,150 @@ function viewSettings() {
   <h2>Reading</h2><div class="card"><div class="toggle"><b>Chalisa script</b>
     <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="script" data-id="dev">देवनागरी</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="script" data-id="tel">తెలుగు</button></div></div></div>
 
-  <h2>Device</h2><div class="card">
-    <button class="btn sm line" data-act="refresh">Sync now</button>
-    <button class="btn sm danger" data-act="logout" style="margin-left:6px">Switch person / family</button>
-    <div class="muted" style="font-size:12px;margin-top:12px">Sankalp v1 · data syncs between phones in your family only.</div></div>`;
+  ${standalone() ? '' : `<h2>App</h2><div class="card"><div class="toggle"><div><b>Install Sankalp</b><div class="muted" style="font-size:13px">Home-screen icon, full screen, reminders</div></div>
+    <button class="btn sm primary" data-act="install">Install</button></div></div>`}
+
+  <h2>Account</h2><div class="card">
+    <div class="muted" style="font-size:14px">Signed in as <b style="color:var(--ink)">${esc(S.user?.email || '')}</b></div>
+    <div class="actions"><button class="btn sm line" data-act="refresh">Sync now</button>
+    <button class="btn sm danger" data-act="logout">Sign out</button></div>
+    <div class="muted" style="font-size:12px;margin-top:12px">Sankalp v2 · your logs can only be written by you; your family can see them.</div></div>`;
 }
 
-// ------------------------------------------------------------------ onboarding
+// ------------------------------------------------------------------ install
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; render(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; toast('Installed 🙏 Open Sankalp from your home screen'); render(); });
+async function install() {
+  if (deferredInstall) { deferredInstall.prompt(); const r = await deferredInstall.userChoice; deferredInstall = null; if (r.outcome === 'accepted') render(); return; }
+  const ios = isIOS, safari = /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+  const steps = ios
+    ? (safari
+      ? ['Tap the <b>Share</b> button <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> at the bottom of Safari', 'Scroll and tap <b>Add to Home Screen</b>', 'Tap <b>Add</b>, then open <b>Sankalp</b> from your home screen', 'Sign in once inside the app (iPhone keeps the app separate from Safari)']
+      : ['Open <b>sankalp.balendu.me</b> in <b>Safari</b> — iPhone only installs apps from Safari', 'Tap <b>Share</b> → <b>Add to Home Screen</b>', 'Open Sankalp from your home screen and sign in'])
+    : ['Open the browser menu <b>⋮</b>', 'Tap <b>Install app</b> or <b>Add to Home screen</b>', 'Open Sankalp from your home screen'];
+  document.getElementById('layer').innerHTML = `<div class="sheet-bg" data-act="sheet-bg"><div class="sheet"><div class="grab"></div>
+    <div class="row" style="gap:14px;margin-bottom:6px"><img src="icons/icon-192.png" style="width:56px;height:56px;border-radius:14px" alt=""><div><h3>Install Sankalp</h3><div class="muted" style="font-size:14px">Adds it to your home screen like a normal app</div></div></div>
+    <ol style="line-height:1.7;padding-left:22px;margin:16px 0">${steps.map((x) => `<li style="margin-bottom:6px">${x}</li>`).join('')}</ol>
+    <button class="btn primary block" data-act="close-sheet">Got it</button></div></div>`;
+}
+const installBtn = (cls = 'btn line block') => standalone() ? '' : `<button class="${cls}" data-act="install">📲 Install app</button>`;
+
+// ------------------------------------------------------------------ sign in & onboarding
 function onboarding() {
-  const join = new URLSearchParams(location.search).get('join') || S.pendingJoin;
-  if (S.joinMembers) {
-    return `<div class="onb"><img class="logo" src="icons/icon-512.png" alt=""><h1>Who are you?</h1>
-      <p class="tag">Joining family <b>${esc(S.pendingJoin)}</b></p><div class="stack">
-      ${S.joinMembers.map((m) => `<button class="btn line block" data-act="pick-me" data-id="${m.id}" style="justify-content:flex-start">${avatar(m, 30)} ${esc(m.name)}</button>`).join('')}
-      <div class="or">— or I'm new —</div>
-      <input id="onb-name" placeholder="Your name" maxlength="30" autocomplete="given-name">
-      <button class="btn primary block" data-act="join-new">Join</button></div></div>`;
+  const brand = `<img class="logo" src="icons/icon-512.png" alt="">`;
+  if (S.booting) return `<div class="onb">${brand}<p class="tag">Loading…</p></div>`;
+  const join = S.pendingJoin || LS.get('pendingJoin', null);
+  if (!S.user) {
+    if (S.authStep === 'code') {
+      return `<div class="onb">${brand}<h1>Check your email</h1>
+        <p class="tag">We sent a sign-in code to<br><b>${esc(S.authEmail)}</b></p><div class="stack">
+        <input id="onb-otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="Enter the code" style="text-align:center;font-size:24px;letter-spacing:6px">
+        <button class="btn primary block" data-act="verify">Sign in</button>
+        <button class="btn line block" data-act="auth-back">Use a different email</button>
+        <button class="btn block" style="background:none;color:var(--muted)" data-act="send-code">Resend code</button></div></div>`;
+    }
+    return `<div class="onb">${brand}<h1>Sankalp</h1>
+      <p class="tag">Hanuman Chalisa & sadhana tracker.<br>Keep your vow, day by day — together.</p>
+      ${join ? `<div class="banner" style="text-align:center">You've been invited to join a family 🙏<br>Sign in to continue.</div>` : ''}
+      <div class="stack">
+      <input id="onb-email" type="email" inputmode="email" autocomplete="email" placeholder="Your email" value="${esc(S.authEmail)}">
+      <button class="btn primary block" data-act="send-code">Email me a sign-in code</button>
+      <div class="or">No password needed — we email you a one-time code.</div>
+      ${installBtn()}</div></div>`;
   }
-  return `<div class="onb"><img class="logo" src="icons/icon-512.png" alt="">
-    <h1>Sankalp</h1><p class="tag">Hanuman Chalisa & sadhana tracker.<br>Keep your vow, day by day — together.</p>
-    <div class="stack">
+  if (S.joinMembers) {
+    const free = S.joinMembers.filter((m) => !m.claimed);
+    return `<div class="onb">${brand}<h1>Who are you?</h1>
+      <p class="tag">Joining family <b>${esc(S.pendingJoin)}</b></p><div class="stack">
+      ${free.map((m) => `<button class="btn line block" data-act="pick-me" data-id="${m.id}" style="justify-content:flex-start">${avatar(m, 30)} I'm ${esc(m.name)}</button>`).join('')}
+      ${free.length ? `<div class="or">— or I'm new —</div>` : ''}
+      <input id="onb-name" placeholder="Your name" maxlength="30" autocomplete="given-name">
+      <button class="btn primary block" data-act="join-new">Join</button>
+      <button class="btn block" style="background:none;color:var(--muted)" data-act="join-cancel">Cancel</button></div></div>`;
+  }
+  return `<div class="onb">${brand}<h1>Namaste 🙏</h1>
+    <p class="tag">Signed in as <b>${esc(S.user.email)}</b></p><div class="stack">
     ${join ? `<div class="banner" style="text-align:center">You've been invited to a family<br><b style="display:inline">${esc(join)}</b></div>
-      <button class="btn primary block" data-act="join" data-id="${esc(join)}">Continue</button>`
+      <button class="btn primary block" data-act="join" data-id="${esc(join)}">Join this family</button>`
     : `<input id="onb-name" placeholder="Your name" maxlength="30" autocomplete="given-name">
-      <button class="btn primary block" data-act="create">Start</button>
-      <div class="or">Have an invite code from your family?</div>
+      <button class="btn primary block" data-act="create">Start a new family</button>
+      <div class="or">Already have a family code? (e.g. from your brother, or one you set up earlier)</div>
       <input id="onb-code" placeholder="SK-XXXX-XXXX-XXXX" autocapitalize="characters">
       <button class="btn line block" data-act="join-code">Join family</button>`}
-    </div></div>`;
+    <button class="btn block" style="background:none;color:var(--muted)" data-act="logout-quiet">Sign out</button></div></div>`;
+}
+async function sendCode() {
+  if (!client()) return toast('Still loading — check your connection and try again');
+  const el = document.getElementById('onb-email');
+  const email = (el ? el.value : S.authEmail).trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('Enter a valid email');
+  if (!navigator.onLine) return toast('Connect to the internet to sign in');
+  const { error } = await client().auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+  if (error) return toast(/rate|seconds/i.test(error.message) ? 'Please wait a minute before asking for another code' : 'Could not send: ' + error.message, 4500);
+  S.authEmail = email; LS.set('authEmail', email); S.authStep = 'code'; render();
+  setTimeout(() => document.getElementById('onb-otp')?.focus(), 100);
+}
+async function verifyCode() {
+  const token = document.getElementById('onb-otp').value.replace(/\D/g, '');
+  if (token.length < 6) return toast('Enter the code from the email');
+  const { data, error } = await client().auth.verifyOtp({ email: S.authEmail, token, type: 'email' });
+  if (error) return toast(/expired|invalid/i.test(error.message) ? 'That code is wrong or expired — try again or resend' : error.message, 4000);
+  S.user = data.user; S.authStep = 'email';
+  await loadMembership();
+}
+// Find which family this signed-in person belongs to.
+async function loadMembership() {
+  const c = client();
+  const { data, error } = await c.from('sk_members').select('*').eq('user_id', S.user.id).order('created_at').limit(1);
+  if (error) { toast('Could not load: ' + error.message); S.booting = false; render(); return; }
+  if (data && data[0]) {
+    if (S.me && S.me !== data[0].id) { S.data = { members: [], sadhanas: [], logs: [] }; S.outbox = []; LS.set('outbox', []); }
+    S.family = data[0].family_code; S.me = data[0].id; LS.set('family', S.family); LS.set('me', S.me);
+    LS.set('pendingJoin', null); S.pendingJoin = null; S.joinMembers = null;
+    if (!S.data.members.some((m) => m.id === S.me)) S.data.members.push(data[0]);
+    history.replaceState(null, '', location.pathname);
+    S.booting = false; render(); await pull(); return;
+  }
+  // a phone that used Sankalp before email sign-in: offer to claim that family
+  const legacy = S.family && /^SK-/.test(S.family) ? S.family : null;
+  S.family = null; S.me = null; S.booting = false;
+  const join = LS.get('pendingJoin', null) || legacy;
+  if (join) await startJoin(join); else render();
 }
 async function createFamily() {
   const name = document.getElementById('onb-name').value.trim();
   if (!name) return toast('Please enter your name');
   if (!navigator.onLine) return toast('Connect to the internet to set up');
-  S.family = newCode(); sb = null;
-  const c = client();
-  const f = await c.from('sk_families').insert({ code: S.family });
-  if (f.error) { S.family = null; return toast('Could not create: ' + f.error.message); }
-  const m = { id: uid(), family_code: S.family, name, color: COLORS[0], tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' };
-  const r = await c.from('sk_members').insert(m);
-  if (r.error) return toast('Could not create: ' + r.error.message);
-  LS.set('family', S.family); S.me = m.id; LS.set('me', m.id);
-  S.data = { members: [m], sadhanas: [], logs: [] }; save();
-  render(); openNew();
+  const { error } = await client().rpc('sk_create_family', { p_name: name, p_color: COLORS[0], p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' });
+  if (error) return toast('Could not create: ' + error.message);
+  S.data = { members: [], sadhanas: [], logs: [] };
+  await loadMembership(); openNew();
 }
 async function startJoin(code) {
   code = (code || '').trim().toUpperCase();
-  if (!/^SK-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return toast('That code doesn’t look right');
-  S.family = code; sb = null;
-  const c = client();
-  const f = await c.from('sk_families').select('code').maybeSingle();
-  if (f.error || !f.data) { S.family = null; return toast('Family not found — check the code'); }
-  const m = await c.from('sk_members').select('*').order('created_at');
-  S.pendingJoin = code; S.joinMembers = m.data || [];
+  if (!/^SK-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) { LS.set('pendingJoin', null); render(); return toast('That code doesn’t look right'); }
+  const { data, error } = await client().rpc('sk_join_info', { p_code: code });
+  if (error) { LS.set('pendingJoin', null); S.pendingJoin = null; render(); return toast(/not found/.test(error.message) ? 'Family not found — check the code' : error.message); }
+  S.pendingJoin = code; S.joinMembers = data || [];
   render();
 }
-function finishJoin(memberId) {
-  LS.set('family', S.family); S.me = memberId; LS.set('me', memberId);
-  S.joinMembers = null; S.pendingJoin = null;
-  history.replaceState(null, '', location.pathname);
-  render(); pull();
+async function doJoin(memberId, name) {
+  const used = (S.joinMembers || []).map((m) => m.color);
+  const { error } = await client().rpc('sk_join', { p_code: S.pendingJoin, p_member: memberId || null, p_name: name || null,
+    p_color: COLORS.find((c) => !used.includes(c)) || COLORS[1], p_tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' });
+  if (error) return toast('Could not join: ' + error.message);
+  S.data = { members: [], sadhanas: [], logs: [] };
+  await loadMembership();
+  toast('Welcome to the family 🙏');
 }
-async function joinNew() {
-  const name = document.getElementById('onb-name').value.trim();
-  if (!name) return toast('Please enter your name');
-  const used = S.joinMembers.map((m) => m.color);
-  const m = { id: uid(), family_code: S.family, name, color: COLORS.find((c) => !used.includes(c)) || COLORS[1], tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata' };
-  const r = await client().from('sk_members').insert(m);
-  if (r.error) return toast('Could not join: ' + r.error.message);
-  S.data.members = [...S.joinMembers, m]; finishJoin(m.id);
+async function signOut(ask = true) {
+  if (ask && !confirm('Sign out of Sankalp on this phone? Your data stays saved — sign in again with your email any time.')) return;
+  await disablePush().catch(() => {});
+  await client().auth.signOut().catch(() => {});
+  ['family', 'me', 'data', 'outbox', 'pushOn', 'pushDismissed', 'pendingJoin'].forEach((k) => localStorage.removeItem('sk.' + k));
+  Object.assign(S, { family: null, me: null, user: null, data: { members: [], sadhanas: [], logs: [] }, outbox: [], joinMembers: null, pendingJoin: null, authStep: 'email' });
+  render();
 }
 
 // ------------------------------------------------------------------ new / edit sheet
@@ -817,7 +892,7 @@ async function enablePush() {
     const r = await client().from('sk_push_subs').upsert({ endpoint: j.endpoint, family_code: S.family, member_id: S.me, p256dh: j.keys.p256dh, auth: j.keys.auth });
     if (r.error) throw r.error;
     LS.set('pushOn', true); render();
-    await callFn({ action: 'test', family_code: S.family, member_id: S.me });
+    await callFn({ action: 'test' });
     toast('Reminders on 🔔');
   } catch (e) { console.error(e); toast('Could not enable: ' + (e.message || e)); }
 }
@@ -870,7 +945,8 @@ document.addEventListener('click', async (e) => {
     case 'push': enablePush(); break;
     case 'push-off': disablePush(); break;
     case 'push-later': LS.set('pushDismissed', true); render(); break;
-    case 'push-test': { const r = await callFn({ action: 'test', family_code: S.family, member_id: S.me }); toast(r.sent ? 'Sent — check your notifications' : 'No device registered — toggle reminders off and on'); break; }
+    case 'install-later': LS.set('installDismissed', true); render(); break;
+    case 'push-test': { const r = await callFn({ action: 'test' }); toast(r.sent ? 'Sent — check your notifications' : 'No device registered — toggle reminders off and on'); break; }
     case 'invite': {
       const link = location.origin + location.pathname + '?join=' + encodeURIComponent(S.family);
       const text = `Join me on Sankalp — our Hanuman Chalisa tracker 🚩\n${link}\n(Code: ${S.family})`;
@@ -881,15 +957,25 @@ document.addEventListener('click', async (e) => {
     case 'color': { const m = me(); m.color = id; save(); queue({ t: 'update', table: 'sk_members', id: m.id, row: { color: id } }); render(); break; }
     case 'savename': { const v = document.getElementById('myname').value.trim(); if (!v) break; const m = me(); m.name = v; save(); queue({ t: 'update', table: 'sk_members', id: m.id, row: { name: v } }); render(); toast('Saved'); break; }
     case 'refresh': await pull(); toast('Synced'); break;
-    case 'logout': if (confirm('Sign this phone out? Your data stays safe in the family. Keep your family code to rejoin.')) {
-      await disablePush(); ['family', 'me', 'data', 'outbox', 'pushOn', 'pushDismissed'].forEach((k) => localStorage.removeItem('sk.' + k));
-      S.family = null; S.me = null; S.data = { members: [], sadhanas: [], logs: [] }; S.outbox = []; sb = null; render(); } break;
+    case 'logout': signOut(true); break;
+    case 'logout-quiet': signOut(false); break;
+    case 'send-code': sendCode(); break;
+    case 'verify': verifyCode(); break;
+    case 'auth-back': S.authStep = 'email'; render(); break;
+    case 'install': install(); break;
+    case 'close-sheet': closeSheet(); break;
     case 'create': createFamily(); break;
     case 'join': startJoin(id); break;
     case 'join-code': startJoin(document.getElementById('onb-code').value); break;
-    case 'pick-me': finishJoin(id); break;
-    case 'join-new': joinNew(); break;
+    case 'join-cancel': S.joinMembers = null; S.pendingJoin = null; LS.set('pendingJoin', null); render(); break;
+    case 'pick-me': doJoin(id, null); break;
+    case 'join-new': { const n = document.getElementById('onb-name').value.trim(); if (!n) { toast('Please enter your name'); break; } doJoin(null, n); break; }
   }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  if (e.target.id === 'onb-email') sendCode();
+  else if (e.target.id === 'onb-otp') verifyCode();
 });
 document.addEventListener('change', (e) => {
   if (!S.form || !e.target.matches('.sheet [data-f]')) return;
@@ -910,8 +996,23 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
   navigator.serviceWorker.addEventListener('message', (e) => { if (e.data?.type === 'refresh') pull(); });
 }
+// keep ?join= across the email sign-in
+const joinParam = new URLSearchParams(location.search).get('join');
+if (joinParam) LS.set('pendingJoin', joinParam.trim().toUpperCase());
 render();
-pull();
+(async () => {
+  const c = client();
+  if (!c) { S.booting = false; render(); return toast('Could not load — check your connection'); }
+  const { data } = await c.auth.getSession();
+  S.user = data?.session?.user || null;
+  if (S.user && S.family && S.me && me()) { S.booting = false; render(); pull(); loadMembership(); }
+  else if (S.user) await loadMembership();
+  else { S.booting = false; render(); }
+  c.auth.onAuthStateChange((ev, session) => {
+    if (ev === 'SIGNED_OUT' && S.user) { S.user = null; render(); }
+    if (session?.user) S.user = session.user;
+  });
+})();
 </script>
 </body>
 </html>
