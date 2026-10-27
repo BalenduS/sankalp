@@ -231,13 +231,18 @@ const SAPTASHLOKI = {
 };
 // Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
 function toTelugu(s) {
-  return s.replace(/[ऀ-ॿ]/g, (ch) => {
-    if (ch === '़') return '';            // nukta
-    if (ch === '।' || ch === '॥') return ch;   // dandas are shared
-    if (ch === '\u0901') return 'ం';          // chandrabindu → anusvara (Telugu convention)
-    if (ch === 'ॐ') return 'ఓం';              // Om has no Telugu code point
-    return String.fromCharCode(ch.charCodeAt(0) + 0x300);
-  });
+  const t = s
+    // Telugu print writes a nasal before a stop consonant as anusvara: मन्त्र → మంత్ర, अम्बा → అంబా
+    .replace(/[ङञणनम]्(?=[क-घच-झट-ढत-धप-भ])/g, 'ं')
+    .replace(/[ऀ-ॿ]/g, (ch) => {
+      if (ch === '़') return '';            // nukta
+      if (ch === '।' || ch === '॥') return ch;   // dandas are shared
+      if (ch === 'ँ') return 'ం';          // chandrabindu → anusvara (Telugu convention)
+      if (ch === 'ॐ') return 'ఓం';              // Om has no Telugu code point
+      return String.fromCharCode(ch.charCodeAt(0) + 0x300);
+    });
+  // titles and jaikara use the Telugu form హనుమాన్ (verses keep హనుమాన, as in printed Telugu Chalisa)
+  return t.replace(/^శ్రీ హనుమాన చాలీసా$/, 'శ్రీ హనుమాన్ చాలీసా').replace(/హనుమాన కీ జయ/g, 'హనుమాన్ కీ జయ');
 }
 
 // ------------------------------------------------------------------ sadhana catalogue
