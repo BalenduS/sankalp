@@ -951,7 +951,7 @@ function openReader(id) {
   if (kind === 'saptashloki') {
     const T = SAPTASHLOKI; title = T.title;
     body = (S.readIntro !== id ? `<div class="doha" style="font-size:1.05em;font-weight:600">${tr(T.open)}</div>${T.intro.map(([h, v]) => `<div class="doha"><small>${tr(h)}</small>${brk(v)}</div>`).join('')}` : '')
-      + T.verses.map((v, i) => `<div class="verse"><span class="no">${i + 1}</span><span class="tx">${brk(v)}</span></div>`).join('')
+      + T.verses.map((v, i) => `<div class="verse"><span class="tx">${brk(v).replace(/॥$/, `॥ ${i + 1} ॥`)}</span></div>`).join('')
       + `<div class="doha" style="font-size:.85em">${tr(T.close)}</div>`;
   } else {
     title = 'श्री हनुमान चालीसा';
