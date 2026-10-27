@@ -129,6 +129,7 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .reader .ttl{font-family:"Noto Serif Devanagari","Noto Serif Telugu",Figtree,serif}
 .tel .ttl,.tel .doha small{font-family:"Noto Serif Telugu",serif;letter-spacing:0;text-transform:none}
 .doha small{font-size:12px}
+.reader .doha small{letter-spacing:0;text-transform:none;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-size:13px}
 .tel .doha small{font-size:14px}
 .doha{text-align:center;margin:8px 0 26px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;line-height:1.8;color:var(--deep)}
 @media (prefers-color-scheme:dark){.doha{color:#FFB26B}}
@@ -151,6 +152,38 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 @keyframes pop{0%{transform:scale(.6);opacity:0}12%{transform:scale(1.08);opacity:1}22%{transform:scale(1)}82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.95) translateY(-10px)}}
 @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}}
+/* ---- reading cards ---- */
+.rtools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.rcount{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.reader .body.cbody{padding:0;max-width:none;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.rprog{height:3px;background:var(--line);flex:none}
+.rprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--saffron2),var(--saffron));transition:width .35s ease}
+.cards{flex:1;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.cards::-webkit-scrollbar{display:none}
+.rcard{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;padding:18px 18px 26px;overflow-y:auto}
+.rcard-in{width:100%;max-width:560px;min-height:62%;margin:auto;background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:0 18px 40px rgba(120,60,0,.12);padding:30px 22px 34px;text-align:center;position:relative;display:flex;flex-direction:column;justify-content:center;
+  background-image:radial-gradient(circle at 50% -10%,rgba(245,158,43,.16),transparent 55%);transform:scale(.92);opacity:.45;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s}
+.rcard-in::before,.rcard-in::after{content:"❁";position:absolute;color:var(--saffron2);opacity:.35;font-size:20px}
+.rcard-in::before{top:12px;left:16px}.rcard-in::after{bottom:12px;right:16px}
+.rcard.active .rcard-in{transform:none;opacity:1}
+.rcard.active .ctext{animation:textin .6s cubic-bezier(.2,.8,.2,1) both .08s}
+@keyframes textin{from{opacity:0;transform:translateY(10px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+.clabel{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--saffron);margin-bottom:16px}
+.tel .clabel{letter-spacing:0;text-transform:none;font-size:14px;font-family:"Noto Serif Telugu",serif}
+.ctext{font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-size:1.18em;line-height:1.9;color:var(--ink);font-weight:500}
+.tel .ctext{font-family:"Noto Serif Telugu",serif}
+.rcard:not(.v) .ctext{color:var(--deep)}
+@media (prefers-color-scheme:dark){.rcard:not(.v) .ctext{color:#FFB26B}.rcard-in{box-shadow:0 18px 40px rgba(0,0,0,.4)}}
+.rcard .inv{font-size:.72em;color:var(--saffron);margin-bottom:6px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
+.rcard .opener{font-size:1.15em;font-weight:700;color:var(--deep);margin-bottom:16px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
+.reader:not(.is-cards) .inv{text-align:center;font-size:.8em;color:var(--deep);margin-bottom:6px}
+.reader:not(.is-cards) .opener{text-align:center;font-weight:600;font-size:1.05em;color:var(--deep);margin-bottom:18px}
+.iti{margin-top:14px;font-size:.85em}
+.ctext .alt{font-size:.6em}
+.cnav{display:flex;gap:10px}
+.cnav .btn.line{width:58px;font-size:22px;padding:12px 0}
+.cnav .btn.primary{flex:1;padding:15px;transition:background .3s}
+.cnav .btn.primary.finish{background:linear-gradient(135deg,#58C27F,var(--ok))}
 /* ---- motion ---- */
 .wrap.enter .card,.wrap.enter h2,.wrap.enter .banner{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms)}
 @keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
@@ -183,6 +216,7 @@ nav.tabs button.on svg{animation:tabpop .4s cubic-bezier(.3,1.7,.5,1)}
 .wrap.enter .fam .check{animation:checkpop .5s cubic-bezier(.3,1.8,.5,1) both;animation-delay:.25s}
 @keyframes checkpop{from{transform:scale(0) rotate(-30deg)}to{transform:none}}
 .reader footer .btn.primary{position:relative;overflow:hidden}
+.cnav .btn.primary:not(.finish)::after{display:none}
 .reader footer .btn.primary::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);background-size:250% 100%;animation:sheen 3s ease-in-out infinite}
 .rain{position:fixed;inset:0;pointer-events:none;z-index:94;overflow:hidden}
 .rain span{position:absolute;top:-40px;font-size:24px;animation:fall linear forwards}
@@ -381,6 +415,7 @@ const S = {
   data: LS.get('data', { members: [], sadhanas: [], logs: [] }),
   outbox: LS.get('outbox', []),
   script: LS.get('script', 'dev'),
+  readMode: LS.get('readMode', 'cards'),
   fs: LS.get('fs', 22),
   tab: 'today', enter: true, flushing: false, lastSync: null, syncErr: false,
   user: null, authStep: 'email', authEmail: LS.get('authEmail', ''), booting: true,
@@ -1066,39 +1101,106 @@ function saveEdit() {
 }
 
 // ------------------------------------------------------------------ reader
-function openReader(id) {
-  S.reader = id; const s = S.data.sadhanas.find((x) => x.id === id);
+// Build the text as a list of units: each becomes one card, or one block in scroll mode.
+function readerUnits(s, skipIntro) {
   const tr = (x) => S.script === 'tel' ? toTelugu(x) : x;
-  const c = logOf(id, today());
-  const kind = kindOf(s).reader;
+  const te = S.script === 'tel';
   const brk = (v) => tr(v).replace(/\n/g, '<br>').replace(/। /g, '।<br>');
-  let title, body;
-  if (kind === 'saptashloki') {
-    const te = S.script === 'tel', T = te ? SAPTASHLOKI_TE : SAPTASHLOKI;
+  const U = [];
+  if (kindOf(s).reader === 'saptashloki') {
+    const T = te ? SAPTASHLOKI_TE : SAPTASHLOKI;
     const as = (v) => te ? v.replace(/\n/g, '<br>') : brk(v);   // printed Telugu is shown exactly, no conversion
-    title = te ? T.title : tr(T.title);
-    body = (S.readIntro !== id ? `${T.pre ? `<div class="doha" style="margin-bottom:6px;font-size:.8em">${T.pre}</div>` : ''}<div class="doha" style="font-size:1.05em;font-weight:600">${te ? T.open : tr(T.open)}</div>${T.intro.map(([h, v]) => `<div class="doha">${h ? `<small>${te ? h : tr(h)}</small>` : ''}${as(v)}</div>`).join('')}` : '')
-      + T.verses.map((v, i) => `<div class="verse"><span class="tx">${as(v).replace(/\s*॥$/, ` ॥ ${i + 1} ॥`)}</span></div>`).join('')
-      + `<div class="doha" style="font-size:.85em">${te ? T.close : tr(T.close)}</div>`;
-  } else {
-    title = 'श्रीहनुमानचालीसा';
-    body = `<div class="doha" style="margin-bottom:6px;font-size:.8em">${tr('॥ श्रीहनूमते नमः ॥')}</div>
-      <div class="doha"><small>${tr('दोहा')}</small>${CHALISA.open.map(tr).join('<br>')}</div>
-      <div class="doha" style="margin:-6px 0 14px"><small>${tr('चौपाई')}</small></div>
-      ${S.script === 'tel'
-        ? CHALISA_TE_VERSES.map((pair) => `<div class="verse"><span class="tx">${pair.map((l) => esc(l).replace(/\s*(\[[^\]]*\])/g, ' <span class="alt">$1</span>')).join('<br>')}</span></div>`).join('')
-        : CHALISA.verses.map((v, i) => `<div class="verse"><span class="no">${i + 1}</span><span class="tx">${tr(v).replace(/। /, '।<br>')}</span></div>`).join('')}
-      <div class="doha"><small>${tr('दोहा')}</small>${CHALISA.close.map(tr).join('<br>')}</div>
-      <div class="doha" style="font-size:.85em">॥ ${tr('इति')} ॥</div>`;
+    const x = (v) => te ? v : tr(v);
+    if (!skipIntro) {
+      const [shiva, devi, vin] = T.intro;
+      U.push({ cls: 'doha', top: `${T.pre ? `<div class="inv">${T.pre}</div>` : ''}<div class="opener">${x(T.open)}</div>`, label: x(shiva[0]), html: as(shiva[1]) });
+      U.push({ cls: 'doha', label: x(devi[0]), html: as(devi[1]) });
+      U.push({ cls: 'doha', label: vin[0] ? x(vin[0]) : (te ? 'వినియోగః' : 'विनियोगः'), html: as(vin[1]) });
+    }
+    T.verses.forEach((v, i) => U.push({ cls: 'verse', label: `${tr('श्लोक')} ${i + 1}`, html: as(v).replace(/\s*॥$/, ` ॥ ${i + 1} ॥`) }));
+    U.push({ cls: 'doha', label: '', html: x(T.close), end: true });
+    return { title: te ? T.title : tr(T.title), units: U };
   }
-  const target = s.daily_target;
-  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''}">
-    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${kind === 'saptashloki' ? title : tr(title)}</div>
-      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
-      <button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></header>
-    <div class="body" id="rbody" style="font-size:${S.fs}px">${body}</div>
-    <footer><button class="btn primary block" data-act="reader-done" style="padding:16px">✓ Paath complete · ${Math.min(c + 1, target)} of ${target}</button></footer></div>`;
+  const L = CHALISA.open.map(tr);
+  U.push({ cls: 'doha', top: `<div class="inv">${tr('॥ श्रीहनूमते नमः ॥')}</div>`, label: tr('दोहा'), html: L.slice(0, 2).join('<br>') });
+  U.push({ cls: 'doha', label: tr('दोहा'), html: L.slice(2).join('<br>'), cont: true });
+  const verses = te
+    ? CHALISA_TE_VERSES.map((pair) => pair.map((l) => esc(l).replace(/\s*(\[[^\]]*\])/g, ' <span class="alt">$1</span>')).join('<br>'))
+    : CHALISA.verses.map((v) => tr(v).replace(/। /, '।<br>'));
+  verses.forEach((v, i) => U.push({ cls: 'verse', no: te ? null : i + 1, label: `${tr('चौपाई')} ${i + 1}`, html: v, head: i === 0 ? tr('चौपाई') : null }));
+  U.push({ cls: 'doha', label: tr('दोहा'), html: CHALISA.close.map(tr).join('<br>') + `<div class="iti">॥ ${tr('इति')} ॥</div>`, end: true });
+  return { title: tr('श्रीहनुमानचालीसा'), units: U };
 }
+function scrollHtml(U) {
+  return U.map((u) => {
+    if (u.cls === 'verse') return `${u.head ? `<div class="doha" style="margin:-6px 0 14px"><small>${u.head}</small></div>` : ''}<div class="verse">${u.no ? `<span class="no">${u.no}</span>` : ''}<span class="tx">${u.html}</span></div>`;
+    return `${u.top || ''}<div class="doha"${u.cont ? ' style="margin-top:-18px"' : ''}>${u.label && !u.cont ? `<small>${u.label}</small>` : ''}${u.html}</div>`;
+  }).join('');
+}
+function cardsHtml(U) {
+  return `<div class="rprog"><i id="rbar"></i></div><div class="cards" id="cards">${U.map((u, i) =>
+    `<section class="rcard${u.cls === 'verse' ? ' v' : ''}" data-i="${i}"><div class="rcard-in">
+      ${u.top || ''}${u.label ? `<div class="clabel">${u.label}</div>` : ''}<div class="ctext">${u.html}</div>
+    </div></section>`).join('')}</div>`;
+}
+function openReader(id, atStart) {
+  S.reader = id; const s = S.data.sadhanas.find((x) => x.id === id);
+  const c = logOf(id, today()), target = s.daily_target;
+  const { title, units } = readerUnits(s, S.readIntro === id);
+  const cards = S.readMode === 'cards';
+  S.rUnits = units.length;
+  const doneBtn = `✓ Paath complete · ${Math.min(c + 1, target)} of ${target}`;
+  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''} ${cards ? 'is-cards' : ''}">
+    <header><button class="btn sm line" data-act="close-reader" aria-label="Close">✕</button><div class="ttl">${title}</div>
+      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div></header>
+    <div class="rtools"><div class="seg"><button class="${cards ? 'on' : ''}" data-act="rmode" data-id="cards">▢ Cards</button><button class="${cards ? '' : 'on'}" data-act="rmode" data-id="scroll">☰ Scroll</button></div>
+      <span class="rcount" id="rcount">${cards ? `1 / ${units.length}` : ''}</span>
+      <div class="row" style="gap:6px"><button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></div></div>
+    ${cards ? `<div class="body cbody" id="rbody" style="font-size:${S.fs}px">${cardsHtml(units)}</div>`
+      : `<div class="body" id="rbody" style="font-size:${S.fs}px">${scrollHtml(units)}</div>`}
+    <footer>${cards
+      ? `<div class="cnav"><button class="btn line" data-act="cprev" aria-label="Previous">‹</button><button class="btn primary" id="cnext" data-act="cnext">Next ›</button></div>`
+      : `<button class="btn primary block" data-act="reader-done" style="padding:16px">${doneBtn}</button>`}</footer></div>`;
+  if (cards) initCards(doneBtn, atStart ? 0 : (S.cardPos && S.cardPos.id === id ? S.cardPos.i : 0));
+}
+function initCards(doneBtn, startAt) {
+  const box = document.getElementById('cards'); if (!box) return;
+  const cards = [...box.children], n = cards.length;
+  const next = document.getElementById('cnext'), cnt = document.getElementById('rcount'), bar = document.getElementById('rbar');
+  let cur = -1;
+  const setActive = (i) => {
+    if (i === cur) return; cur = i;
+    cards.forEach((c, k) => c.classList.toggle('active', k === i));
+    cnt.textContent = `${i + 1} / ${n}`; bar.style.width = ((i + 1) / n * 100) + '%';
+    const last = i === n - 1;
+    next.textContent = last ? doneBtn : 'Next ›'; next.dataset.act = last ? 'reader-done' : 'cnext';
+    next.classList.toggle('finish', last);
+    S.cardPos = { id: S.reader, i };
+    if (navigator.vibrate) navigator.vibrate(6);
+  };
+  let raf = 0;
+  box.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => setActive(Math.round(box.scrollLeft / box.clientWidth))); }, { passive: true });
+  // tap the right part of a card to go on, the left edge to go back
+  box.addEventListener('click', (e) => {
+    if (e.target.closest('button,a')) return;
+    const r = box.getBoundingClientRect(); goCard(e.clientX - r.left < r.width * 0.28 ? -1 : 1);
+  });
+  box.scrollLeft = startAt * box.clientWidth; setActive(startAt);
+}
+function celebrateSmall(text) {
+  const m = document.createElement('div'); m.className = 'center-msg';
+  m.innerHTML = `<div><span class="big">🙏</span>${esc(text)}<small>Next paath begins</small></div>`;
+  document.body.appendChild(m); setTimeout(() => m.remove(), 1600);
+}
+function goCard(d) {
+  const box = document.getElementById('cards'); if (!box) return;
+  const i = Math.max(0, Math.min(box.children.length - 1, Math.round(box.scrollLeft / box.clientWidth) + d));
+  box.scrollTo({ left: i * box.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+document.addEventListener('keydown', (e) => {
+  if (!S.reader || S.readMode !== 'cards') return;
+  if (e.key === 'ArrowRight') goCard(1); else if (e.key === 'ArrowLeft') goCard(-1);
+});
 
 // ------------------------------------------------------------------ push
 function b64ToU8(s) { const p = '='.repeat((4 - s.length % 4) % 4); const b = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...b].map((c) => c.charCodeAt(0))); }
@@ -1144,11 +1246,17 @@ document.addEventListener('click', async (e) => {
     case 'reader-done': {
       const rid = S.reader; const s = sd() || S.data.sadhanas.find((x) => x.id === rid);
       const before = logOf(rid, today()); tap(rid, 1);
-      if (kindOf(s).reader === 'saptashloki' && before + 1 < s.daily_target) {
-        S.readIntro = rid; openReader(rid); document.getElementById('rbody').scrollTop = 0; toast(`${before + 1} of ${s.daily_target} 🙏`, 1200);
-      } else { document.getElementById('layer').innerHTML = ''; S.reader = null; S.readIntro = null; render(); }
+      if (before + 1 < s.daily_target) {
+        // more paaths today: start the next one straight away (Saptashloki skips the opening dialogue)
+        if (kindOf(s).reader === 'saptashloki') S.readIntro = rid;
+        S.cardPos = null; openReader(rid, true); document.getElementById('rbody').scrollTop = 0;
+        celebrateSmall(`${before + 1} of ${s.daily_target}`);
+      } else { document.getElementById('layer').innerHTML = ''; S.reader = null; S.readIntro = null; S.cardPos = null; render(); }
       break; }
     case 'rscript': S.script = id; LS.set('script', id); openReader(S.reader); break;
+    case 'rmode': S.readMode = id; LS.set('readMode', id); openReader(S.reader); break;
+    case 'cprev': goCard(-1); break;
+    case 'cnext': goCard(1); break;
     case 'font': { S.fs = Math.min(34, Math.max(16, S.fs + +id)); LS.set('fs', S.fs); document.getElementById('rbody').style.fontSize = S.fs + 'px'; break; }
     case 'script': S.script = id; LS.set('script', id); render(); break;
     case 'new': openNew(); break;

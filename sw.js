@@ -1,4 +1,4 @@
-const VERSION = 'sankalp-v12';
+const VERSION = 'sankalp-v13';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png', './icons/logo.svg', './vendor/supabase.min.js'];
 
 self.addEventListener('install', (e) => {
