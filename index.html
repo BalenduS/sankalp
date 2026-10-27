@@ -148,9 +148,49 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .center-msg div{background:var(--card);padding:22px 28px;border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,.2);text-align:center;font-weight:800;font-size:20px;animation:pop 1.8s ease forwards}
 .center-msg small{display:block;font-weight:600;font-size:14px;color:var(--muted);margin-top:4px}
 @keyframes fly{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(1.2) rotate(var(--r));opacity:0}}
-@keyframes pop{0%{transform:scale(.7);opacity:0}15%{transform:scale(1.05);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}12%{transform:scale(1.08);opacity:1}22%{transform:scale(1)}82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.95) translateY(-10px)}}
 @keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 @keyframes fade{from{opacity:0}}
+/* ---- motion ---- */
+.wrap.enter .card,.wrap.enter h2,.wrap.enter .banner{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 70ms)}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.top img{animation:glow 4s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 0 rgba(245,158,43,0))}50%{filter:drop-shadow(0 0 10px rgba(245,158,43,.55))}}
+.ring .ripple{position:absolute;left:50%;top:50%;width:136px;height:136px;margin:-68px 0 0 -68px;border-radius:50%;border:3px solid var(--saffron2);pointer-events:none;animation:ripple .7s ease-out forwards}
+@keyframes ripple{from{transform:scale(1);opacity:.8}to{transform:scale(1.45);opacity:0}}
+.ring.bump .inner{animation:bump .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.09)}100%{transform:scale(1)}}
+.ring.bump .big{animation:numpop .35s ease-out}
+@keyframes numpop{0%{transform:translateY(8px);opacity:.3}100%{transform:none;opacity:1}}
+.ring.done::before{content:"";position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(88,194,127,.35) 0%,rgba(88,194,127,0) 70%);animation:breathe 2.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.92);opacity:.55}50%{transform:scale(1.06);opacity:1}}
+.ring:not(.done) .inner::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);background-size:250% 100%;animation:sheen 3.8s ease-in-out infinite}
+.ring .inner{position:relative;overflow:hidden}
+@keyframes sheen{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
+.floater{position:fixed;z-index:80;pointer-events:none;font-weight:800;font-size:26px;color:var(--saffron);text-shadow:0 2px 8px rgba(232,101,15,.35);animation:floatup .9s ease-out forwards}
+@keyframes floatup{0%{transform:translate(-50%,0) scale(.7);opacity:0}15%{opacity:1;transform:translate(-50%,-10px) scale(1.1)}100%{transform:translate(-50%,-90px) scale(1);opacity:0}}
+.dots i.today,.dots i.partial-today{animation:tick 1.8s ease-in-out infinite}
+@keyframes tick{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.dots i.justdone{animation:dotpop .6s cubic-bezier(.3,1.8,.5,1)}
+@keyframes dotpop{0%{transform:scale(.2)}60%{transform:scale(1.6)}100%{transform:scale(1)}}
+.streak{display:inline-flex;align-items:center;gap:3px;font-weight:800;font-size:12px;padding:5px 9px;border-radius:99px;background:linear-gradient(135deg,#FFE3B3,#FFC27A);color:#9A3A05;margin-right:6px}
+.streak b{display:inline-block;animation:flicker 1.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes flicker{0%,100%{transform:rotate(-4deg) scale(1)}25%{transform:rotate(3deg) scale(1.08)}50%{transform:rotate(-2deg) scale(.96)}75%{transform:rotate(4deg) scale(1.05)}}
+nav.tabs button.on svg{animation:tabpop .4s cubic-bezier(.3,1.7,.5,1)}
+@keyframes tabpop{0%{transform:scale(.7) translateY(3px)}100%{transform:none}}
+.fab{transition:transform .2s}.fab:active{transform:rotate(90deg) scale(.92)}
+.fam .check{display:inline-block}
+.wrap.enter .fam .check{animation:checkpop .5s cubic-bezier(.3,1.8,.5,1) both;animation-delay:.25s}
+@keyframes checkpop{from{transform:scale(0) rotate(-30deg)}to{transform:none}}
+.reader footer .btn.primary{position:relative;overflow:hidden}
+.reader footer .btn.primary::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);background-size:250% 100%;animation:sheen 3s ease-in-out infinite}
+.rain{position:fixed;inset:0;pointer-events:none;z-index:94;overflow:hidden}
+.rain span{position:absolute;top:-40px;font-size:24px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r));opacity:.9}}
+.center-msg .big{font-size:34px;display:block;margin-bottom:4px}
+.empty img{animation:float 3.5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 .onb{min-height:100dvh;display:flex;flex-direction:column;justify-content:center;max-width:440px;margin:0 auto;padding:24px 20px}
 .onb .logo{width:112px;height:112px;border-radius:30px;margin:0 auto 18px;box-shadow:0 18px 40px rgba(232,101,15,.3);display:block}
 .onb h1{text-align:center;font-size:30px;margin:0;letter-spacing:-.5px}
@@ -342,7 +382,7 @@ const S = {
   outbox: LS.get('outbox', []),
   script: LS.get('script', 'dev'),
   fs: LS.get('fs', 22),
-  tab: 'today', flushing: false, lastSync: null, syncErr: false,
+  tab: 'today', enter: true, flushing: false, lastSync: null, syncErr: false,
   user: null, authStep: 'email', authEmail: LS.get('authEmail', ''), booting: true,
 };
 let sb = null;
@@ -477,14 +517,33 @@ function tap(id, delta) {
   if (after === before) return;
   setCount(s, t, after);
   if (navigator.vibrate) navigator.vibrate(delta > 0 ? 18 : [8, 40, 8]);
-  if (delta > 0 && before < s.daily_target && after >= s.daily_target) dayComplete(s);
+  const completing = delta > 0 && before < s.daily_target && after >= s.daily_target;
+  if (completing) dayComplete(s);
   render();
+  const ring = document.querySelector(`.ring[data-id="${id}"]`);
+  if (ring && delta > 0) {
+    ring.classList.add('bump');
+    const rp = document.createElement('span'); rp.className = 'ripple'; ring.appendChild(rp);
+    floatAt(ring, delta === 1 ? '+1' : '+' + delta);
+  }
+  if (completing) {
+    const card = ring && ring.closest('.card');
+    const todayDot = card && [...card.querySelectorAll('.dots i')][dayStates(s).findIndex((x) => x.d === today())];
+    if (todayDot) todayDot.classList.add('justdone');
+  }
 }
 function dayComplete(s) {
   const n = dayNo(s, today());
   if (navigator.vibrate) navigator.vibrate([30, 60, 30, 60, 80]);
   const last = doneCount(s) >= s.total_days;
-  celebrate(last ? 'Sankalp complete! 🙏' : `Day ${n} complete`, last ? `${s.total_days} days of ${s.title}` : 'Jai Shri Ram');
+  const half = !last && doneCount(s) === Math.ceil(s.total_days / 2);
+  const streak = streakOf(s);
+  const milestone = !last && [7, 11, 21, 40, 41, 51, 108].includes(streak);
+  const jai = kindOf(s).deity === 'devi' ? 'Jai Mata Di' : 'Jai Shri Ram';
+  if (last) { celebrate('Sankalp complete!', `${s.total_days} days of ${s.title} 🙏`, '🏆'); petalRain(60); }
+  else if (half) { celebrate('Halfway there!', `${doneCount(s)} of ${s.total_days} days · ${jai}`, '🌗'); petalRain(40); }
+  else if (milestone) { celebrate(`${streak} days in a row!`, jai, '🔥'); petalRain(40); }
+  else { celebrate(`Day ${n} complete`, jai, '🪔'); petalRain(22); }
   callFn({ action: 'cheer',
     title: last ? `🎉 ${me()?.name} completed the sankalp!` : `🚩 ${me()?.name} finished today's ${s.title}`,
     body: last ? `${s.total_days} days of ${s.title}. Jai Hanuman!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
@@ -501,7 +560,7 @@ function toast(msg, ms = 2600) {
   const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
   document.body.appendChild(el); setTimeout(() => el.remove(), ms);
 }
-function celebrate(title, sub) {
+function celebrate(title, sub, icon = '') {
   const b = document.createElement('div'); b.className = 'burst';
   const icons = ['🌼', '🌸', '🪔', '🚩', '✨', '🌺'];
   for (let i = 0; i < 26; i++) {
@@ -514,15 +573,49 @@ function celebrate(title, sub) {
     b.appendChild(sp);
   }
   const m = document.createElement('div'); m.className = 'center-msg';
-  m.innerHTML = `<div>${esc(title)}<small>${esc(sub)}</small></div>`;
-  document.body.append(b, m); setTimeout(() => { b.remove(); m.remove(); }, 1900);
+  m.innerHTML = `<div>${icon ? `<span class="big">${icon}</span>` : ''}${esc(title)}<small>${esc(sub)}</small></div>`;
+  document.body.append(b, m); setTimeout(() => { b.remove(); m.remove(); }, 2200);
 }
 const avatar = (m, size = 38) => `<div class="av" style="background:${esc(m.color)};width:${size}px;height:${size}px">${esc((m.name || '?')[0].toUpperCase())}</div>`;
-function ringSvg(frac, done) {
-  const r = 80, c = 2 * Math.PI * r;
+const lastFrac = {};
+function ringSvg(frac, done, id) {
+  const r = 80, c = 2 * Math.PI * r, to = c * (1 - Math.min(1, frac));
+  const from = id in lastFrac ? c * (1 - Math.min(1, lastFrac[id])) : c;   // first paint sweeps in from empty
+  lastFrac[id] = frac;
   return `<svg viewBox="0 0 168 168"><circle cx="84" cy="84" r="${r}" fill="none" stroke="var(--line)" stroke-width="7"/>
-  <circle cx="84" cy="84" r="${r}" fill="none" stroke="${done ? 'var(--ok)' : 'var(--saffron)'}" stroke-width="7" stroke-linecap="round"
-   stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - Math.min(1, frac))}" style="transition:stroke-dashoffset .3s"/></svg>`;
+  <circle class="prog" data-to="${to}" cx="84" cy="84" r="${r}" fill="none" stroke="${done ? 'var(--ok)' : 'var(--saffron)'}" stroke-width="7" stroke-linecap="round"
+   stroke-dasharray="${c}" stroke-dashoffset="${from}" style="transition:stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1)"/></svg>`;
+}
+function animateRings() {
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    document.querySelectorAll('circle.prog').forEach((el) => el.setAttribute('stroke-dashoffset', el.dataset.to))));
+}
+// consecutive completed days up to today (or yesterday, if today isn't done yet)
+function streakOf(s) {
+  const st = dayStates(s).filter((x) => x.st !== 'excused' && x.st !== 'future');
+  let i = st.length - 1, n = 0;
+  if (i >= 0 && st[i].st !== 'done') i--;
+  for (; i >= 0 && st[i].st === 'done'; i--) n++;
+  return n;
+}
+function floatAt(el, text) {
+  if (!el) return; const r = el.getBoundingClientRect();
+  const f = document.createElement('div'); f.className = 'floater'; f.textContent = text;
+  f.style.left = (r.left + r.width / 2) + 'px'; f.style.top = (r.top + 10) + 'px';
+  document.body.appendChild(f); setTimeout(() => f.remove(), 950);
+}
+function petalRain(n = 34) {
+  const box = document.createElement('div'); box.className = 'rain';
+  const icons = ['🌼', '🌸', '🌺', '🏵️', '✨'];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('span'); p.textContent = icons[i % icons.length];
+    p.style.left = (Math.random() * 100) + 'vw';
+    p.style.setProperty('--dx', (Math.random() * 80 - 40) + 'px'); p.style.setProperty('--r', (Math.random() * 540 - 270) + 'deg');
+    p.style.animationDuration = (2.2 + Math.random() * 1.8) + 's'; p.style.animationDelay = (Math.random() * .9) + 's';
+    p.style.fontSize = (16 + Math.random() * 16) + 'px';
+    box.appendChild(p);
+  }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 5000);
 }
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
@@ -534,13 +627,16 @@ function render() {
   const app = document.getElementById('app');
   if (!S.user || !S.family || !S.me || !me()) { app.innerHTML = onboarding(); return; }
   const body = S.tab === 'today' ? viewToday() : S.tab === 'history' ? viewHistory() : viewSettings();
-  app.innerHTML = `<div class="wrap">${header()}${body}</div>
+  const enter = S.enter; S.enter = false;
+  app.innerHTML = `<div class="wrap${enter ? ' enter' : ''}">${header()}${body}</div>
   ${S.tab !== 'settings' ? `<button class="fab" data-act="new" aria-label="New sadhana">+</button>` : ''}
   <nav class="tabs"><div class="in">
     ${tabBtn('today', 'Today', '<path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/>')}
     ${tabBtn('history', 'Sadhanas', '<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>')}
     ${tabBtn('settings', 'Settings', '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>')}
   </div></nav>`;
+  if (enter) app.querySelectorAll('.wrap > .card, .wrap > h2, .wrap > .banner').forEach((el, i) => el.style.setProperty('--i', Math.min(i, 8)));
+  animateRings();
 }
 const tabBtn = (id, label, path) => `<button class="${S.tab === id ? 'on' : ''}" data-act="tab" data-id="${id}">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>${label}</button>`;
@@ -631,12 +727,12 @@ function todayCard(s, t) {
   return `<div class="card">
     <div class="sd-head"><div><div class="sd-title">${k.emoji} ${esc(s.title)}</div>
     <div class="sd-meta">${s.daily_target} ${esc(s.unit)}${s.daily_target > 1 ? 's' : ''} a day${s.reminder_time ? ' · 🔔 ' + hm(s.reminder_time) : ''}</div></div>
-    <span class="pill ${done ? 'ok' : ''}">Day ${n} / ${s.total_days}</span></div>
+    <div style="display:flex;align-items:center">${streakOf(s) >= 2 ? `<span class="streak" title="Days in a row"><b>🔥</b>${streakOf(s)}</span>` : ''}<span class="pill ${done ? 'ok' : ''}">Day ${n} / ${s.total_days}</span></div></div>
     ${s.sankalp ? `<div class="sd-meta" style="margin-top:8px;font-style:italic">“${esc(s.sankalp)}”</div>` : ''}
     <div class="counter">
       <div class="side"><button class="mini ghost" data-act="dec" data-id="${s.id}" aria-label="Undo">−</button></div>
       <div class="ring ${done ? 'done' : ''}" data-act="inc" data-id="${s.id}" role="button" aria-label="Add one">
-        ${ringSvg(c / s.daily_target, done)}
+        ${ringSvg(c / s.daily_target, done, s.id)}
         <div class="inner"><div><div class="big">${done && s.daily_target === 1 ? '✓' : c}</div>
         <div class="small">${done ? 'Done today' : `of ${s.daily_target} · tap +1`}</div></div></div></div>
       <div class="side">${k.reader ? `<button class="mini" data-act="read" data-id="${s.id}" aria-label="Read">📖</button>` : `<button class="mini" data-act="fill" data-id="${s.id}" aria-label="Mark all">✓</button>`}</div>
@@ -1039,7 +1135,7 @@ document.addEventListener('click', async (e) => {
   const act = el.dataset.act, id = el.dataset.id;
   const sd = () => S.data.sadhanas.find((x) => x.id === id);
   switch (act) {
-    case 'tab': S.tab = id; render(); scrollTo(0, 0); break;
+    case 'tab': if (S.tab !== id) { S.tab = id; S.enter = true; } render(); scrollTo(0, 0); break;
     case 'inc': tap(id, 1); break;
     case 'dec': tap(id, -1); break;
     case 'fill': { const s = sd(); tap(id, s.daily_target - logOf(id, today())); break; }
