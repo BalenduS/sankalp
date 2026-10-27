@@ -211,33 +211,58 @@ const CHALISA = {
   ],
   close: ['पवनतनय संकट हरन, मंगल मूरति रूप।', 'राम लखन सीता सहित, हृदय बसहु सुर भूप॥'],
 };
+const SAPTASHLOKI = {
+  title: 'श्रीदुर्गासप्तश्लोकी',
+  intro: [
+    ['शिव उवाच', 'देवि त्वं भक्तसुलभे सर्वकार्यविधायिनी। कलौ हि कार्यसिद्ध्यर्थमुपायं ब्रूहि यत्नतः॥'],
+    ['देव्युवाच', 'शृणु देव प्रवक्ष्यामि कलौ सर्वेष्टसाधनम्। मया तवैव स्नेहेनाप्यम्बास्तुतिः प्रकाश्यते॥'],
+    ['विनियोगः', 'ॐ अस्य श्रीदुर्गासप्तश्लोकीस्तोत्रमन्त्रस्य नारायण ऋषिः, अनुष्टुप् छन्दः, श्रीमहाकालीमहालक्ष्मीमहासरस्वत्यो देवताः, श्रीदुर्गाप्रीत्यर्थं सप्तश्लोकीदुर्गापाठे विनियोगः।'],
+  ],
+  verses: [
+    'ॐ ज्ञानिनामपि चेतांसि देवी भगवती हि सा। बलादाकृष्य मोहाय महामाया प्रयच्छति॥',
+    'दुर्गे स्मृता हरसि भीतिमशेषजन्तोः स्वस्थैः स्मृता मतिमतीव शुभां ददासि। दारिद्र्यदुःखभयहारिणि का त्वदन्या सर्वोपकारकरणाय सदार्द्रचित्ता॥',
+    'सर्वमङ्गलमङ्गल्ये शिवे सर्वार्थसाधिके। शरण्ये त्र्यम्बके गौरि नारायणि नमोऽस्तु ते॥',
+    'शरणागतदीनार्तपरित्राणपरायणे। सर्वस्यार्तिहरे देवि नारायणि नमोऽस्तु ते॥',
+    'सर्वस्वरूपे सर्वेशे सर्वशक्तिसमन्विते। भयेभ्यस्त्राहि नो देवि दुर्गे देवि नमोऽस्तु ते॥',
+    'रोगानशेषानपहंसि तुष्टा रुष्टा तु कामान् सकलानभीष्टान्। त्वामाश्रितानां न विपन्नराणां त्वामाश्रिता ह्याश्रयतां प्रयान्ति॥',
+    'सर्वाबाधाप्रशमनं त्रैलोक्यस्याखिलेश्वरि। एवमेव त्वया कार्यमस्मद्वैरिविनाशनम्॥',
+  ],
+  close: 'इति श्रीदुर्गासप्तश्लोकी सम्पूर्णा।',
+};
 // Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
 function toTelugu(s) {
   return s.replace(/[ऀ-ॿ]/g, (ch) => {
     if (ch === '़') return '';            // nukta
     if (ch === '।' || ch === '॥') return ch;   // dandas are shared
     if (ch === '\u0901') return 'ం';          // chandrabindu → anusvara (Telugu convention)
+    if (ch === 'ॐ') return 'ఓం';              // Om has no Telugu code point
     return String.fromCharCode(ch.charCodeAt(0) + 0x300);
   });
 }
 
 // ------------------------------------------------------------------ sadhana catalogue
 const KINDS = {
-  chalisa: { title: 'Hanuman Chalisa', unit: 'paath', emoji: '🚩', reader: true, plans: [
+  chalisa: { title: 'Hanuman Chalisa', unit: 'paath', emoji: '🚩', reader: 'chalisa', deity: 'hanuman', plans: [
     { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
     { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
     { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
     { n: 'Mahasadhana', days: 108, count: 1, d: '1 paath a day · 108 days' },
   ] },
-  sundarkand: { title: 'Sundarkand', unit: 'paath', emoji: '📿', plans: [
+  saptashloki: { title: 'Durga Saptashloki', unit: 'paath', emoji: '🔱', reader: 'saptashloki', deity: 'devi', plans: [
+    { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
+    { n: 'Navaratri', days: 9, count: 108, d: '108 a day · 9 nights' },
+    { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
+    { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
+  ] },
+  sundarkand: { title: 'Sundarkand', unit: 'paath', emoji: '📿', deity: 'hanuman', plans: [
     { n: '11 days', days: 11, count: 1, d: '1 paath a day' }, { n: '21 days', days: 21, count: 1, d: '1 paath a day' },
     { n: '40 days', days: 40, count: 1, d: '1 paath a day' }, { n: '7 days', days: 7, count: 1, d: '1 paath a day' },
   ] },
-  bajrang: { title: 'Bajrang Baan', unit: 'paath', emoji: '🏹', plans: [
+  bajrang: { title: 'Bajrang Baan', unit: 'paath', emoji: '🏹', deity: 'hanuman', plans: [
     { n: '21 days', days: 21, count: 1, d: '1 paath a day' }, { n: '41 days', days: 41, count: 1, d: '1 paath a day' },
     { n: '21 × 3', days: 21, count: 3, d: '3 paaths a day' }, { n: '11 days', days: 11, count: 1, d: '1 paath a day' },
   ] },
-  japa: { title: 'Om Shri Hanumate Namah', unit: 'mala', emoji: '🕉️', plans: [
+  japa: { title: 'Om Shri Hanumate Namah', unit: 'mala', emoji: '🕉️', deity: 'hanuman', plans: [
     { n: '40 days', days: 40, count: 1, d: '1 mala (108) a day' }, { n: '21 days', days: 21, count: 3, d: '3 malas a day' },
     { n: '41 days', days: 41, count: 11, d: '11 malas a day' }, { n: '11 days', days: 11, count: 1, d: '1 mala a day' },
   ] },
@@ -247,6 +272,27 @@ const KINDS = {
   ] },
 };
 const kindOf = (s) => KINDS[s.kind] || KINDS.custom;
+const DEITY = {
+  hanuman: { days: [2, 6], note: '★ Tuesday & Saturday are Hanumanji\'s days.', guide: [
+    'Start on a Tuesday or Saturday — ideally in Shukla Paksha (waxing moon).',
+    'On Day 1, sit before Hanumanji\'s picture, light a diya and take your sankalp: state your name, the count, the days and your intention.',
+    'Recite at the same time and place daily. Brahma muhurta or after the morning bath is best; before sleep also works.',
+    'Common plans: 7 or 11 paaths daily for 21 days, 11 daily for 41 days, or once daily for a 40-day mandala.',
+    'Keep the food sattvic — no meat or alcohol during the sadhana.',
+    'If a day is missed, many traditions restart from Day 1. The app lets you choose.',
+    'On the last day, offer prasad (boondi / gud-chana), visit a Hanuman temple if you can, and feed someone.',
+  ] },
+  devi: { days: [2, 5], note: '★ Tuesday & Friday are Devi\'s days. Navaratri, Ashtami, Navami and Chaturdashi are also auspicious.', guide: [
+    'Saptashloki is seven verses from the Devi Mahatmya (Durga Saptashati), given by Devi to Shiva as the way to every goal in Kali Yuga. Reciting it is held to equal the full Saptashati.',
+    'Begin on a Tuesday or Friday, on Ashtami / Navami / Chaturdashi, or on the first day of Navaratri — ideally in Shukla Paksha.',
+    'Bathe, sit before Durga Maa\'s picture, light a diya and take the sankalp: your name, the count, the days and your intention.',
+    'Read the Shiva–Devi dialogue and viniyoga once, then the seven shlokas for each count.',
+    'Common plans: once daily as nitya parayana; 7 or 11 daily for 21–41 days; 108 daily through Navaratri, as the Sringeri Jagadguru asked of devotees.',
+    'Keep the food sattvic for the duration. If a day is missed, the app lets you extend or restart.',
+    'On the last day, offer prasad (kheer or fruit), recite Durga Ashtottara if you can, and feed a girl child or someone in need.',
+  ] },
+};
+const deityOf = (k) => DEITY[(KINDS[k] || {}).deity] || DEITY.hanuman;
 
 // ------------------------------------------------------------------ storage + state
 const LS = {
@@ -286,6 +332,13 @@ const hm = (t) => { if (!t) return ''; const [h, m] = t.split(':').map(Number); 
 // ------------------------------------------------------------------ sadhana maths
 const me = () => S.data.members.find((m) => m.id === S.me);
 const member = (id) => S.data.members.find((m) => m.id === id) || { name: '?', color: '#999' };
+// The daily count can change mid-way; earlier days keep the count that applied then.
+function targetOn(s, date) {
+  const h = s.target_history || [];
+  let t = s.daily_target;
+  for (let i = h.length - 1; i >= 0; i--) { if (date < h[i].until) t = h[i].target; else break; }
+  return t;
+}
 const logOf = (sid, date) => S.data.logs.find((l) => l.sadhana_id === sid && l.log_date === date)?.count || 0;
 const exc = (s) => s.excused_dates || [];
 const span = (s) => s.total_days + exc(s).length;
@@ -302,7 +355,7 @@ function dayStates(s) {
     if (exc(s).includes(d)) st = 'excused';
     else {
       const c = logOf(s.id, d);
-      if (c >= s.daily_target) st = 'done';
+      if (c >= targetOn(s, d)) st = 'done';
       else if (d > t) st = 'future';
       else if (d === t) st = c > 0 ? 'partial-today' : 'today';
       else st = c > 0 ? 'partial' : 'missed';
@@ -603,7 +656,7 @@ function viewSettings() {
     <div class="actions"><button class="btn sm primary" data-act="invite">Share invite link</button>
     <button class="btn sm line" data-act="copy" data-id="${esc(link)}">Copy link</button></div></div>
 
-  <h2>Reading</h2><div class="card"><div class="toggle"><b>Chalisa script</b>
+  <h2>Reading</h2><div class="card"><div class="toggle"><b>Reading script</b>
     <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="script" data-id="dev">देवनागरी</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="script" data-id="tel">తెలుగు</button></div></div></div>
 
   ${standalone() ? '' : `<h2>App</h2><div class="card"><div class="toggle"><div><b>Install Sankalp</b><div class="muted" style="font-size:13px">Home-screen icon, full screen, reminders</div></div>
@@ -764,7 +817,8 @@ function openNew() {
 function openEdit(id) {
   const s = S.data.sadhanas.find((x) => x.id === id);
   S.form = { mode: 'edit', id, title: s.title, sankalp: s.sankalp || '', reminder: (s.reminder_time || '').slice(0, 5),
-    nudgeOn: !!s.nudge_time, nudge: (s.nudge_time || '21:00').slice(0, 5), status: s.status };
+    nudgeOn: !!s.nudge_time, nudge: (s.nudge_time || '21:00').slice(0, 5), status: s.status,
+    count: s.daily_target, days: s.total_days, start: s.start_date, unit: s.unit };
   openSheet();
 }
 function openSheet() { document.getElementById('layer').innerHTML = `<div class="sheet-bg" data-act="sheet-bg"><div class="sheet">${sheetHtml()}</div></div>`; }
@@ -773,8 +827,14 @@ function closeSheet() { document.getElementById('layer').innerHTML = ''; S.form 
 function sheetHtml() {
   const f = S.form;
   if (f.mode === 'edit') {
+    const s = S.data.sadhanas.find((x) => x.id === f.id); const begun = s.start_date <= today();
+    const U = (f.unit || 'times').replace(/^./, (c) => c.toUpperCase());
     return `<div class="grab"></div><h3>Edit sadhana</h3>
       <div class="lbl">Name</div><input data-f="title" value="${esc(f.title)}" maxlength="50">
+      <div class="two" style="margin-top:14px"><div><label>${esc(U)}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div>
+        <div><label>Total days</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div></div>
+      ${begun ? `<div class="muted" style="font-size:12px;margin:6px 2px">A new count applies from today. Days already completed stay completed.</div>`
+        : `<div class="lbl">Start date</div><input data-f="start" type="date" value="${f.start}">`}
       <div class="lbl">Sankalp (intention)</div><textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional">${esc(f.sankalp)}</textarea>
       ${remindersHtml()}
       <div class="actions" style="margin-top:22px"><button class="btn primary block" data-act="save-edit">Save</button></div>
@@ -782,8 +842,8 @@ function sheetHtml() {
       <div class="actions"><button class="btn danger sm" data-act="delete">Delete permanently</button></div>`;
   }
   const k = KINDS[f.kind];
-  const tue = nextWeekday(2), sat = nextWeekday(6), t = today();
-  const starts = [[t, 'Today'], [tue, fmt(tue) + ' ★'], [sat, fmt(sat) + ' ★']].filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i);
+  const dt = deityOf(f.kind), t = today();
+  const starts = [[t, 'Today'], ...dt.days.map((w) => nextWeekday(w)).sort().map((d) => [d, fmt(d) + ' ★'])].filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i);
   const others = S.data.members.filter((m) => m.id !== S.me);
   return `<div class="grab"></div><h3>New sankalp</h3>
     <div class="muted" style="font-size:14px">Choose the sadhana, the length, and when to begin.</div>
@@ -794,19 +854,23 @@ function sheetHtml() {
     <div class="lbl">Plan</div><div class="plans">
       ${k.plans.map((p, i) => `<button class="chip ${f.plan === i ? 'on' : ''}" data-act="plan" data-id="${i}">${esc(p.n)}<small>${esc(p.d)}</small></button>`).join('')}</div>
     <div class="two" style="margin-top:10px"><div><label>Days</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div>
-      <div><label>${esc((f.unit || 'times').replace(/^./, (c) => c.toUpperCase()))}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div></div>
+      <div><label id="unitlbl">${esc((f.unit || 'times').replace(/^./, (c) => c.toUpperCase()))}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div></div>
     <div class="lbl">Start</div><div class="chips">
       ${starts.map(([d, l]) => `<button class="chip ${f.start === d ? 'on' : ''}" data-act="start" data-id="${d}">${l}</button>`).join('')}
       <input data-f="start" type="date" value="${f.start}" style="width:auto;flex:1;min-width:150px"></div>
-    <div class="muted" style="font-size:12px;margin:6px 2px">★ Tuesday & Saturday are Hanumanji's days. Ends ${fmt(addDays(f.start, (+f.days || 1) - 1), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}.</div>
+    <div class="muted" style="font-size:12px;margin:6px 2px">${dt.note} <span id="enddate">${endText()}</span></div>
     <div class="lbl">Sankalp (intention)</div>
     <textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional — what you dedicate this sadhana to">${esc(f.sankalp)}</textarea>
     ${remindersHtml()}
     ${others.length ? `<div class="lbl">Who is doing this?</div><div class="chips">
       ${S.data.members.map((m) => `<button class="chip ${f.who.includes(m.id) ? 'on' : ''}" data-act="who" data-id="${m.id}">${m.id === S.me ? 'Me' : esc(m.name)}</button>`).join('')}</div>
       <div class="muted" style="font-size:12px;margin:6px 2px">Each person gets their own tracker and reminders.</div>` : ''}
-    ${guideHtml()}
+    ${guideHtml(f.kind)}
     <div class="actions" style="margin-top:20px"><button class="btn primary block" data-act="create-sadhana">Take the sankalp 🙏</button></div>`;
+}
+function endText() {
+  const f = S.form; const d = Math.round(+f.days);
+  return f.start && d >= 1 ? `Ends ${fmt(addDays(f.start, d - 1), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}.` : '';
 }
 function remindersHtml() {
   const f = S.form;
@@ -815,15 +879,9 @@ function remindersHtml() {
     <div><label>If not done by</label><input data-f="nudge" type="time" value="${f.nudge}" ${f.nudgeOn ? '' : 'disabled'}></div></div>
     <div class="toggle"><span style="font-size:14px">Evening nudge if pending</span><button class="sw ${f.nudgeOn ? 'on' : ''}" data-act="nudge-toggle" aria-label="toggle"></button></div>`;
 }
-function guideHtml() {
-  return `<details class="guide"><summary>How to begin a sadhana</summary><ul>
-    <li>Start on a Tuesday or Saturday — ideally in Shukla Paksha (waxing moon).</li>
-    <li>On Day 1, sit before Hanumanji's picture, light a diya and take your sankalp: state your name, the count, the days and your intention.</li>
-    <li>Recite at the same time and place daily. Brahma muhurta or after the morning bath is best; before sleep also works.</li>
-    <li>Common plans: 7 or 11 paaths daily for 21 days, 11 daily for 41 days, or once daily for a 40-day mandala.</li>
-    <li>Keep the food sattvic — no meat or alcohol during the sadhana.</li>
-    <li>If a day is missed, many traditions restart from Day 1. The app lets you choose.</li>
-    <li>On the last day, offer prasad (boondi / gud-chana), visit a Hanuman temple if you can, and feed someone.</li>
+function guideHtml(kind) {
+  return `<details class="guide"><summary>How to begin this sadhana</summary><ul>
+    ${deityOf(kind).guide.map((x) => `<li>${esc(x)}</li>`).join('')}
   </ul></details>`;
 }
 function readForm() {
@@ -852,8 +910,26 @@ function createSadhanas() {
 function saveEdit() {
   readForm(); const f = S.form; const s = S.data.sadhanas.find((x) => x.id === f.id);
   if (!f.title.trim()) return toast('Name can’t be empty');
-  updateSadhana(s, { title: f.title.trim(), sankalp: f.sankalp.trim() || null, reminder_time: f.reminder || null,
-    nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null });
+  const count = Math.round(+f.count), days = Math.round(+f.days), t = today();
+  if (!(count >= 1 && count <= 10000)) return toast('Count per day should be at least 1');
+  if (!(days >= 1 && days <= 1000)) return toast('Days should be 1–1000');
+  const patch = { title: f.title.trim(), sankalp: f.sankalp.trim() || null, reminder_time: f.reminder || null,
+    nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null, total_days: days };
+  if (s.start_date > t) {
+    if (!f.start) return toast('Pick a start date');
+    patch.start_date = f.start; patch.daily_target = count;
+  } else if (count !== s.daily_target) {
+    // remember the old count for days before today so they don't turn into "missed"
+    const h = (s.target_history || []).filter((x) => x.until <= t);
+    if (s.start_date < t && !h.some((x) => x.until === t)) h.push({ until: t, target: s.daily_target });
+    patch.target_history = h; patch.daily_target = count;
+  }
+  if (days < doneCount(s)) return toast(`You've already completed ${doneCount(s)} days`);
+  const was = s.status;
+  updateSadhana(s, patch);
+  if (was === 'active' && doneCount(s) >= s.total_days && logOf(s.id, t) >= s.daily_target) {
+    updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
+  }
   closeSheet(); render(); toast('Saved');
 }
 
@@ -862,17 +938,28 @@ function openReader(id) {
   S.reader = id; const s = S.data.sadhanas.find((x) => x.id === id);
   const tr = (x) => S.script === 'tel' ? toTelugu(x) : x;
   const c = logOf(id, today());
-  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''}">
-    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${tr('श्री हनुमान चालीसा')}</div>
-      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
-      <button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></header>
-    <div class="body" id="rbody" style="font-size:${S.fs}px">
-      <div class="doha"><small>Doha</small>${CHALISA.open.map(tr).join('<br>')}</div>
+  const kind = kindOf(s).reader;
+  const brk = (v) => tr(v).replace(/। /g, '।<br>');
+  let title, body;
+  if (kind === 'saptashloki') {
+    const T = SAPTASHLOKI; title = T.title;
+    body = (S.readIntro !== id ? `${T.intro.map(([h, v]) => `<div class="doha"><small>${tr(h)}</small>${brk(v)}</div>`).join('')}` : '')
+      + T.verses.map((v, i) => `<div class="verse"><span class="no">${i + 1}</span><span class="tx">${brk(v)}</span></div>`).join('')
+      + `<div class="doha" style="font-size:.85em">${tr(T.close)}</div>`;
+  } else {
+    title = 'श्री हनुमान चालीसा';
+    body = `<div class="doha"><small>Doha</small>${CHALISA.open.map(tr).join('<br>')}</div>
       ${CHALISA.verses.map((v, i) => `<div class="verse"><span class="no">${i + 1}</span><span class="tx">${tr(v).replace(/। /, '।<br>')}</span></div>`).join('')}
       <div class="doha"><small>Doha</small>${CHALISA.close.map(tr).join('<br>')}</div>
-      <div class="doha" style="font-size:.85em">सियावर रामचंद्र की जय · पवनसुत हनुमान की जय</div>
-    </div>
-    <footer><button class="btn primary block" data-act="reader-done" style="padding:16px">✓ Paath complete · ${c + 1} of ${s.daily_target}</button></footer></div>`;
+      <div class="doha" style="font-size:.85em">सियावर रामचंद्र की जय · पवनसुत हनुमान की जय</div>`;
+  }
+  const target = s.daily_target;
+  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''}">
+    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${tr(title)}</div>
+      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
+      <button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></header>
+    <div class="body" id="rbody" style="font-size:${S.fs}px">${body}</div>
+    <footer><button class="btn primary block" data-act="reader-done" style="padding:16px">✓ Paath complete · ${Math.min(c + 1, target)} of ${target}</button></footer></div>`;
 }
 
 // ------------------------------------------------------------------ push
@@ -915,15 +1002,23 @@ document.addEventListener('click', async (e) => {
     case 'dec': tap(id, -1); break;
     case 'fill': { const s = sd(); tap(id, s.daily_target - logOf(id, today())); break; }
     case 'read': openReader(id); break;
-    case 'close-reader': document.getElementById('layer').innerHTML = ''; S.reader = null; render(); break;
-    case 'reader-done': { const rid = S.reader; document.getElementById('layer').innerHTML = ''; S.reader = null; tap(rid, 1); break; }
+    case 'close-reader': document.getElementById('layer').innerHTML = ''; S.reader = null; S.readIntro = null; render(); break;
+    case 'reader-done': {
+      const rid = S.reader; const s = sd() || S.data.sadhanas.find((x) => x.id === rid);
+      const before = logOf(rid, today()); tap(rid, 1);
+      if (kindOf(s).reader === 'saptashloki' && before + 1 < s.daily_target) {
+        S.readIntro = rid; openReader(rid); document.getElementById('rbody').scrollTop = 0; toast(`${before + 1} of ${s.daily_target} 🙏`, 1200);
+      } else { document.getElementById('layer').innerHTML = ''; S.reader = null; S.readIntro = null; render(); }
+      break; }
     case 'rscript': S.script = id; LS.set('script', id); openReader(S.reader); break;
     case 'font': { S.fs = Math.min(34, Math.max(16, S.fs + +id)); LS.set('fs', S.fs); document.getElementById('rbody').style.fontSize = S.fs + 'px'; break; }
     case 'script': S.script = id; LS.set('script', id); render(); break;
     case 'new': openNew(); break;
     case 'edit': openEdit(id); break;
     case 'sheet-bg': if (e.target === el) closeSheet(); break;
-    case 'kind': { readForm(); const k = KINDS[id]; Object.assign(S.form, { kind: id, title: k.title, unit: k.unit, plan: 0, days: k.plans[0].days, count: k.plans[0].count }); rerenderSheet(); break; }
+    case 'kind': { readForm(); const k = KINDS[id]; const dd = deityOf(id).days;
+      const st = dd.includes(new Date().getDay()) ? today() : dd.map((w) => nextWeekday(w)).sort()[0];
+      Object.assign(S.form, { kind: id, title: k.title, unit: k.unit, plan: 0, days: k.plans[0].days, count: k.plans[0].count, start: st }); rerenderSheet(); break; }
     case 'plan': { readForm(); const p = KINDS[S.form.kind].plans[+id]; Object.assign(S.form, { plan: +id, days: p.days, count: p.count }); rerenderSheet(); break; }
     case 'start': readForm(); S.form.start = id; rerenderSheet(); break;
     case 'who': { readForm(); const w = S.form.who; S.form.who = w.includes(id) ? (w.length > 1 ? w.filter((x) => x !== id) : w) : [...w, id]; rerenderSheet(); break; }
@@ -934,7 +1029,7 @@ document.addEventListener('click', async (e) => {
     case 'delete': if (confirm('Delete this sadhana and all its logs?')) {
       const did = S.form.id; S.data.sadhanas = S.data.sadhanas.filter((x) => x.id !== did); S.data.logs = S.data.logs.filter((l) => l.sadhana_id !== did);
       save(); queue({ t: 'delete', table: 'sk_sadhanas', id: did }); closeSheet(); render(); } break;
-    case 'fix-log': { const s = sd(); missedDates(s).filter((d) => d < today()).forEach((d) => setCount(s, d, s.daily_target)); autoComplete(); render(); toast('Logged 🙏'); break; }
+    case 'fix-log': { const s = sd(); missedDates(s).filter((d) => d < today()).forEach((d) => setCount(s, d, targetOn(s, d))); autoComplete(); render(); toast('Logged 🙏'); break; }
     case 'extend': { const s = sd(); const md = missedDates(s).filter((d) => d < today()); updateSadhana(s, { excused_dates: [...exc(s), ...md] }); render(); toast(`Extended — now ends ${fmt(endDate(s))}`); break; }
     case 'restart': { const s = sd();
       if (!confirm(`Restart ${s.title} from Day 1 today?`)) break;
@@ -980,8 +1075,14 @@ document.addEventListener('keydown', (e) => {
 document.addEventListener('change', (e) => {
   if (!S.form || !e.target.matches('.sheet [data-f]')) return;
   readForm();
-  if (['days', 'count'].includes(e.target.dataset.f)) S.form.plan = -1;
-  if (['start', 'days', 'count', 'unit'].includes(e.target.dataset.f)) rerenderSheet();
+  const k = e.target.dataset.f;
+  // update in place — re-drawing here would swallow a tap on Save
+  if ((k === 'days' || k === 'count') && S.form.mode === 'new' && S.form.plan !== -1) {
+    S.form.plan = -1; document.querySelectorAll('.plans .chip.on').forEach((c) => c.classList.remove('on'));
+  }
+  if (k === 'start' || k === 'days') { const el = document.getElementById('enddate'); if (el) el.textContent = endText(); }
+  if (k === 'start') document.querySelectorAll('.sheet [data-act=start]').forEach((c) => c.classList.toggle('on', c.dataset.id === S.form.start));
+  if (k === 'unit') { const el = document.getElementById('unitlbl'); if (el) el.textContent = (S.form.unit || 'times').replace(/^./, (c) => c.toUpperCase()) + 's per day'; }
 });
 
 // ------------------------------------------------------------------ boot
