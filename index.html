@@ -125,6 +125,10 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .verse .no{color:var(--saffron);font-weight:700;font-size:13px;min-width:20px;padding-top:.45em}
 .verse .tx{font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-weight:500}
 .tel .verse .tx{font-family:"Noto Serif Telugu",serif}
+.reader .ttl{font-family:"Noto Serif Devanagari","Noto Serif Telugu",Figtree,serif}
+.tel .ttl,.tel .doha small{font-family:"Noto Serif Telugu",serif;letter-spacing:0;text-transform:none}
+.doha small{font-size:12px}
+.tel .doha small{font-size:14px}
 .doha{text-align:center;margin:8px 0 26px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;line-height:1.8;color:var(--deep)}
 @media (prefers-color-scheme:dark){.doha{color:#FFB26B}}
 .doha small{display:block;font-family:Figtree;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
@@ -230,6 +234,27 @@ const SAPTASHLOKI = {
     'सर्वाबाधाप्रशमनं त्रैलोक्यस्याखिलेश्वरि। एवमेव त्वया कार्यमस्मद्वैरिविनाशनम्॥',
   ],
   close: '॥ इति श्रीसप्तश्लोकी दुर्गा सम्पूर्णा ॥',
+};
+// Telugu exactly as printed in Gita Press, Gorakhpur — Durga Saptashati, Telugu (book 909), pp. 7–8
+const SAPTASHLOKI_TE = {
+  title: 'సప్తశ్లోకీ దుర్గా',
+  pre: 'శ్రీదుర్గాయై నమః',
+  open: 'అథ సప్తశ్లోకీ దుర్గా',
+  intro: [
+    ['శివ ఉవాచ -', 'దేవి! త్వం భక్తసులభే సర్వకార్యవిధాయినీ।\nకలౌ హి కార్యసిద్ధ్యర్థముపాయం బ్రూహి యత్నతః॥'],
+    ['దేవ్యువాచ -', 'శృణు దేవ ప్రవక్ష్యామి కలౌ సర్వేష్టసాధనమ్।\nమయా తవైవ స్నేహేనాప్యమ్బాస్తుతిః ప్రకాశ్యతే॥'],
+    ['', 'ఓం అస్య శ్రీ దుర్గా సప్తశ్లోకీ స్తోత్ర మంత్రస్య, నారాయణ ఋషిః, అనుష్టుప్ ఛందః.\nశ్రీమహాకాలీ మహాలక్ష్మీ మహాసరస్వత్యోదేవతాః, శ్రీ దుర్గా ప్రీత్యర్థం సప్తశ్లోకీదుర్గాపాఠే వినియోగః॥'],
+  ],
+  verses: [
+    'ఓం జ్ఞానినామపి చేతాంసి దేవీ భగవతీ హి సా।\nబలాదాకృష్య మోహాయ మహామాయా ప్రయచ్ఛతి ॥',
+    'దుర్గే స్మృతా హరసి భీతి మశేషజంతోః\nస్వస్థైః స్మృతా మతిమతీవ శుభాం దదాసి।\nదారిద్ర్యదుఃఖభయహారిణి కా త్వదన్యా\nసర్వోపకారకరణాయ సదార్ద్రచిత్తా ॥',
+    'సర్వమంగల మాంగల్యే శివే సర్వార్థసాధికే।\nశరణ్యే త్ర్యంబకే గౌరి నారాయణి నమోఽస్తుతే ॥',
+    'శరణాగతదీనార్తపరిత్రాణపరాయణే।\nసర్వస్యార్తిహరే దేవి నారాయణి నమోఽస్తుతే ॥',
+    'సర్వస్వరూపే సర్వేశే సర్వశక్తిసమన్వితే।\nభయేభ్యస్త్రాహి నో దేవి దుర్గే దేవి నమోఽస్తుతే ॥',
+    'రోగానశేషానపహంసి తుష్టా\nరుష్టా తు కామాన్ సకలానభీష్టాన్।\nత్వామాశ్రితానాం న విపన్నరాణాం\nత్వామాశ్రితా హ్యాశ్రయతాం ప్రయాంతి ॥',
+    'సర్వాబాధాప్రశమనం త్రైలోక్యస్యాఖిలేశ్వరి ॥\nఏవమేవ త్వయా కార్యమస్మద్వైరివినాశనమ్ ॥',
+  ],
+  close: '॥ ఇతి శ్రీ సప్తశ్లోకీ దుర్గా సంపూర్ణా ॥',
 };
 // Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
 function toTelugu(s) {
@@ -949,10 +974,12 @@ function openReader(id) {
   const brk = (v) => tr(v).replace(/\n/g, '<br>').replace(/। /g, '।<br>');
   let title, body;
   if (kind === 'saptashloki') {
-    const T = SAPTASHLOKI; title = T.title;
-    body = (S.readIntro !== id ? `<div class="doha" style="font-size:1.05em;font-weight:600">${tr(T.open)}</div>${T.intro.map(([h, v]) => `<div class="doha"><small>${tr(h)}</small>${brk(v)}</div>`).join('')}` : '')
-      + T.verses.map((v, i) => `<div class="verse"><span class="tx">${brk(v).replace(/॥$/, `॥ ${i + 1} ॥`)}</span></div>`).join('')
-      + `<div class="doha" style="font-size:.85em">${tr(T.close)}</div>`;
+    const te = S.script === 'tel', T = te ? SAPTASHLOKI_TE : SAPTASHLOKI;
+    const as = (v) => te ? v.replace(/\n/g, '<br>') : brk(v);   // printed Telugu is shown exactly, no conversion
+    title = te ? T.title : tr(T.title);
+    body = (S.readIntro !== id ? `${T.pre ? `<div class="doha" style="margin-bottom:6px;font-size:.8em">${T.pre}</div>` : ''}<div class="doha" style="font-size:1.05em;font-weight:600">${te ? T.open : tr(T.open)}</div>${T.intro.map(([h, v]) => `<div class="doha">${h ? `<small>${te ? h : tr(h)}</small>` : ''}${as(v)}</div>`).join('')}` : '')
+      + T.verses.map((v, i) => `<div class="verse"><span class="tx">${as(v).replace(/\s*॥$/, ` ॥ ${i + 1} ॥`)}</span></div>`).join('')
+      + `<div class="doha" style="font-size:.85em">${te ? T.close : tr(T.close)}</div>`;
   } else {
     title = 'श्री हनुमान चालीसा';
     body = `<div class="doha"><small>Doha</small>${CHALISA.open.map(tr).join('<br>')}</div>
@@ -962,7 +989,7 @@ function openReader(id) {
   }
   const target = s.daily_target;
   document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''}">
-    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${tr(title)}</div>
+    <header><button class="btn sm line" data-act="close-reader">✕</button><div class="ttl">${kind === 'saptashloki' ? title : tr(title)}</div>
       <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
       <button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></header>
     <div class="body" id="rbody" style="font-size:${S.fs}px">${body}</div>
