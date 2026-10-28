@@ -412,7 +412,7 @@ const DEITY = {
     'Recite at the same time and place daily. Brahma muhurta or after the morning bath is best; before sleep also works.',
     'Common plans: 7 or 11 paaths daily for 21 days, 11 daily for 41 days, or once daily for a 40-day mandala.',
     'Keep the food sattvic — no meat or alcohol during the sadhana.',
-    'If a day is missed, many traditions restart from Day 1. The app lets you choose.',
+    'If a day is missed, the sankalp restarts from Day 1 — the traditional rule. (You can switch a sankalp to “allow extending” instead.)',
     'On the last day, offer prasad (boondi / gud-chana), visit a Hanuman temple if you can, and feed someone.',
   ] },
   devi: { days: [2, 5], note: '★ Tuesday & Friday are Devi\'s days. Navaratri, Ashtami, Navami and Chaturdashi are also auspicious.', guide: [
@@ -421,7 +421,7 @@ const DEITY = {
     'Bathe, sit before Durga Maa\'s picture, light a diya and take the sankalp: your name, the count, the days and your intention.',
     'Read the Shiva–Devi dialogue and viniyoga once, then the seven shlokas for each count.',
     'Common plans: once daily as nitya parayana; 7 or 11 daily for 21–41 days; 108 daily through Navaratri, as the Sringeri Jagadguru asked of devotees.',
-    'Keep the food sattvic for the duration. If a day is missed, the app lets you extend or restart.',
+    'Keep the food sattvic for the duration. If a day is missed, the sankalp restarts from Day 1.',
     'On the last day, offer prasad (kheer or fruit), recite Durga Ashtottara if you can, and feed a girl child or someone in need.',
   ] },
 };
@@ -431,7 +431,7 @@ DEITY.ganesha = { days: [3], note: '★ Wednesday is Ganapati\'s day. Chaturthi,
   'Sit before Ganapati, offer durva grass or a modak if you can, light a diya and take the sankalp: your name, the count, the days and your intention.',
   'The stotram itself says to recite it at the three sandhyas — dawn, noon and dusk — for freedom from obstacles (shloka 5).',
   'Its phala-shruti promises results in six months and siddhi in one year (shloka 7), so 180-day and 365-day plans are offered too.',
-  'If a day is missed, the app lets you extend or restart.',
+  'If a day is missed, the sankalp restarts from Day 1.',
   'On completion, offer modak or laddu, and as shloka 8 suggests, share the stotram — write it out for others or teach it.',
 ] };
 const deityOf = (k) => DEITY[(KINDS[k] || {}).deity] || DEITY.hanuman;
@@ -555,6 +555,7 @@ async function pull() {
     S.data = { members: m.data, sadhanas: s.data, logs: l.data };
     S.lastSync = Date.now(); S.syncErr = false; save();
     autoComplete();
+    autoRestart();
     render();
   } catch (e) { S.syncErr = true; renderSync(); }
 }
@@ -616,6 +617,45 @@ function dayComplete(s) {
     title: last ? `🎉 ${me()?.name} completed the sankalp!` : `🚩 ${me()?.name} finished today's ${s.title}`,
     body: last ? `${s.total_days} days of ${s.title}. ${jaiOf(s)}!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
   if (last) updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
+}
+// A strict sankalp starts again from Day 1 when a day is missed.
+function restartSadhana(s, missedOn) {
+  const t = today(), now = new Date().toISOString();
+  const carry = logOf(s.id, t);
+  updateSadhana(s, { status: 'broken' });
+  const n = { ...s, id: uid(), start_date: t, excused_dates: [], target_history: [], status: 'active', completed_at: null,
+    last_reminded_on: null, last_nudged_on: null, restarted_from: s.id, created_at: now, updated_at: now };
+  S.data.sadhanas.push(n); save();
+  queue({ t: 'upsert', table: 'sk_sadhanas', row: n, key: 'sd:' + n.id });
+  if (carry) setCount(n, t, carry);      // today's paaths count towards the new Day 1
+  const notes = LS.get('restarts', []).filter((x) => x.on >= addDays(t, -3));
+  notes.push({ old: s.id, neu: n.id, missed: missedOn, title: s.title, on: t });
+  LS.set('restarts', notes);
+  return n;
+}
+function autoRestart() {
+  const t = today(); let changed = false;
+  S.data.sadhanas.filter((s) => s.member_id === S.me && s.status === 'active' && s.strict !== false && s.start_date < t).forEach((s) => {
+    if (S.data.sadhanas.some((x) => x.restarted_from === s.id && x.status === 'active')) return;  // another phone already did it
+    const md = missedDates(s).filter((d) => d < t);
+    if (md.length) { restartSadhana(s, md[0]); changed = true; }
+  });
+  return changed;
+}
+function undoRestart(note) {
+  const t = today();
+  const old = S.data.sadhanas.find((x) => x.id === note.old), neu = S.data.sadhanas.find((x) => x.id === note.neu);
+  if (!old) return;
+  const carry = neu ? logOf(neu.id, t) : 0;
+  if (neu) {
+    S.data.sadhanas = S.data.sadhanas.filter((x) => x.id !== neu.id);
+    S.data.logs = S.data.logs.filter((l) => l.sadhana_id !== neu.id); save();
+    queue({ t: 'delete', table: 'sk_sadhanas', id: neu.id });
+  }
+  updateSadhana(old, { status: 'active' });
+  missedDates(old).filter((d) => d < t).forEach((d) => setCount(old, d, targetOn(old, d)));
+  if (carry) setCount(old, t, Math.max(carry, logOf(old.id, t)));
+  LS.set('restarts', LS.get('restarts', []).filter((x) => x.neu !== note.neu));
 }
 function autoComplete() {
   S.data.sadhanas.filter((s) => s.member_id === S.me && s.status === 'active').forEach((s) => {
@@ -739,12 +779,21 @@ function viewToday() {
       : 'Get a nudge at your chosen time, and know when your brother finishes his paath.'}
       <div class="actions"><button class="btn primary sm" data-act="push">Enable</button><button class="btn line sm" data-act="push-later">Later</button></div></div>`;
   }
-  // missed-day prompts
-  mine.filter((s) => s.status === 'active' && diff(s.start_date, t) > 0).forEach((s) => {
+  // restarted after a missed day
+  LS.get('restarts', []).filter((n) => n.on >= addDays(t, -2) && S.data.sadhanas.some((x) => x.id === n.neu && x.status === 'active')).forEach((n) => {
+    html += `<div class="banner miss restart"><b>🔁 ${esc(n.title)} begins again — Day 1 ${n.on === t ? 'is today' : 'was ' + fmt(n.on)}</b>
+      ${fmt(n.missed, { weekday: 'long', day: 'numeric', month: 'short' })} was missed, so the sankalp restarted from Day 1.
+      <div class="actions">
+        <button class="btn sm primary" data-act="restart-ok" data-id="${n.neu}">Jai! Begin again</button>
+        <button class="btn sm line" data-act="restart-undo" data-id="${n.neu}">I did it, just forgot to log</button>
+      </div></div>`;
+  });
+  // missed-day prompts (only for sankalps that allow extending)
+  mine.filter((s) => s.status === 'active' && s.strict === false && diff(s.start_date, t) > 0).forEach((s) => {
     const md = missedDates(s).filter((d) => d < t);
     if (!md.length) return;
     html += `<div class="banner miss"><b>${esc(s.title)}: ${md.length === 1 ? `Day missed — ${fmt(md[0])}` : `${md.length} days incomplete`}</b>
-      Traditionally an anushthan restarts after a break. You choose:
+      This sankalp allows extending. You choose:
       <div class="actions">
         <button class="btn sm line" data-act="fix-log" data-id="${s.id}">I did it, just forgot to log</button>
         <button class="btn sm line" data-act="extend" data-id="${s.id}">Continue, add ${md.length === 1 ? 'a day' : md.length + ' days'} at the end</button>
@@ -1011,14 +1060,14 @@ function openNew() {
   const p = KINDS.chalisa.plans[0];
   S.form = { mode: 'new', kind: 'chalisa', title: KINDS.chalisa.title, unit: 'paath', plan: 0, days: p.days, count: p.count,
     start: new Date().getDay() === 2 || new Date().getDay() === 6 ? today() : nextWeekday(2), sankalp: '',
-    reminder: '06:00', nudgeOn: true, nudge: '21:00', who: [S.me] };
+    reminder: '06:00', nudgeOn: true, nudge: '21:00', who: [S.me], strict: true };
   openSheet();
 }
 function openEdit(id) {
   const s = S.data.sadhanas.find((x) => x.id === id);
   S.form = { mode: 'edit', id, title: s.title, sankalp: s.sankalp || '', reminder: (s.reminder_time || '').slice(0, 5),
     nudgeOn: !!s.nudge_time, nudge: (s.nudge_time || '21:00').slice(0, 5), status: s.status,
-    count: s.daily_target, days: s.total_days, start: s.start_date, unit: s.unit };
+    count: s.daily_target, days: s.total_days, start: s.start_date, unit: s.unit, strict: s.strict !== false };
   openSheet();
 }
 function openSheet() { document.getElementById('layer').innerHTML = `<div class="sheet-bg" data-act="sheet-bg"><div class="sheet">${sheetHtml()}</div></div>`; }
@@ -1037,6 +1086,7 @@ function sheetHtml() {
         : `<div class="lbl">Start date</div><input data-f="start" type="date" value="${f.start}">`}
       <div class="lbl">Sankalp (intention)</div><textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional">${esc(f.sankalp)}</textarea>
       ${remindersHtml()}
+      ${strictHtml()}
       <div class="actions" style="margin-top:22px"><button class="btn primary block" data-act="save-edit">Save</button></div>
       ${f.status === 'active' ? `<div class="actions"><button class="btn line sm" data-act="stop">Stop this sadhana</button></div>` : ''}
       <div class="actions"><button class="btn danger sm" data-act="delete">Delete permanently</button></div>`;
@@ -1062,6 +1112,7 @@ function sheetHtml() {
     <div class="lbl">Sankalp (intention)</div>
     <textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional — what you dedicate this sadhana to">${esc(f.sankalp)}</textarea>
     ${remindersHtml()}
+    ${strictHtml()}
     ${others.length ? `<div class="lbl">Who is doing this?</div><div class="chips">
       ${S.data.members.map((m) => `<button class="chip ${f.who.includes(m.id) ? 'on' : ''}" data-act="who" data-id="${m.id}">${m.id === S.me ? 'Me' : esc(m.name)}</button>`).join('')}</div>
       <div class="muted" style="font-size:12px;margin:6px 2px">Each person gets their own tracker and reminders.</div>` : ''}
@@ -1071,6 +1122,12 @@ function sheetHtml() {
 function endText() {
   const f = S.form; const d = Math.round(+f.days);
   return f.start && d >= 1 ? `Ends ${fmt(addDays(f.start, d - 1), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}.` : '';
+}
+function strictHtml() {
+  const f = S.form;
+  return `<div class="lbl">If a day is missed</div>
+    <div class="toggle"><span style="font-size:14px;line-height:1.4">${f.strict ? '<b>Restart from Day 1</b> — the traditional rule' : '<b>Allow extending</b> — add the missed day at the end'}</span>
+    <button class="sw ${f.strict ? 'on' : ''}" data-act="strict-toggle" aria-label="toggle"></button></div>`;
 }
 function remindersHtml() {
   const f = S.form;
@@ -1099,7 +1156,7 @@ function createSadhanas() {
   f.who.forEach((mid) => {
     const s = { id: uid(), family_code: S.family, member_id: mid, kind: f.kind, title, unit: (f.unit || 'times').trim(),
       daily_target: count, total_days: days, start_date: f.start, excused_dates: [], reminder_time: f.reminder || null,
-      nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, sankalp: f.sankalp.trim() || null, status: 'active', created_at: now, updated_at: now };
+      nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, sankalp: f.sankalp.trim() || null, status: 'active', strict: f.strict !== false, created_at: now, updated_at: now };
     S.data.sadhanas.push(s);
     queue({ t: 'upsert', table: 'sk_sadhanas', row: s, key: 'sd:' + s.id });
   });
@@ -1114,7 +1171,7 @@ function saveEdit() {
   if (!(count >= 1 && count <= 10000)) return toast('Count per day should be at least 1');
   if (!(days >= 1 && days <= 1000)) return toast('Days should be 1–1000');
   const patch = { title: f.title.trim(), sankalp: f.sankalp.trim() || null, reminder_time: f.reminder || null,
-    nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null, total_days: days };
+    nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null, total_days: days, strict: f.strict !== false };
   if (s.start_date > t) {
     if (!f.start) return toast('Pick a start date');
     patch.start_date = f.start; patch.daily_target = count;
@@ -1316,6 +1373,12 @@ document.addEventListener('click', async (e) => {
       save(); queue({ t: 'delete', table: 'sk_sadhanas', id: did }); closeSheet(); render(); } break;
     case 'fix-log': { const s = sd(); missedDates(s).filter((d) => d < today()).forEach((d) => setCount(s, d, targetOn(s, d))); autoComplete(); render(); toast('Logged 🙏'); break; }
     case 'extend': { const s = sd(); const md = missedDates(s).filter((d) => d < today()); updateSadhana(s, { excused_dates: [...exc(s), ...md] }); render(); toast(`Extended — now ends ${fmt(endDate(s))}`); break; }
+    case 'restart-ok': LS.set('restarts', LS.get('restarts', []).filter((x) => x.neu !== id)); render(); break;
+    case 'restart-undo': {
+      const note = LS.get('restarts', []).find((x) => x.neu === id); if (!note) break;
+      if (!confirm('Mark the missed day as done and continue the earlier count?')) break;
+      undoRestart(note); render(); toast('Restored — the count continues 🙏'); break; }
+    case 'strict-toggle': readForm(); S.form.strict = !S.form.strict; rerenderSheet(); break;
     case 'restart': { const s = sd();
       if (!confirm(`Restart ${s.title} from Day 1 today?`)) break;
       updateSadhana(s, { status: 'broken' });
@@ -1376,7 +1439,7 @@ window.addEventListener('offline', renderSync);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { pull(); if (S.tab === 'today' && !S.form && !S.reader) render(); } });
 setInterval(() => { if (document.visibilityState === 'visible' && !S.form) pull(); }, 30000);
 // re-render at midnight so the day rolls over
-let lastDay = today(); setInterval(() => { if (today() !== lastDay) { lastDay = today(); if (!S.form && !S.reader) render(); } }, 60000);
+let lastDay = today(); setInterval(() => { if (today() !== lastDay) { lastDay = today(); pull(); if (!S.form && !S.reader) render(); } }, 60000);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

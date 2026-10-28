@@ -100,9 +100,23 @@ async function tick() {
     if (excused.includes(now.date)) continue;
     const day = span + 1 - excused.filter((d) => d < now.date).length;
 
-    const { data: log } = await db.from("sk_logs").select("count").eq("sadhana_id", s.id).eq("log_date", now.date).maybeSingle();
-    const done = log?.count ?? 0;
+    const { data: logs } = await db.from("sk_logs").select("log_date,count").eq("sadhana_id", s.id).gte("log_date", s.start_date).lte("log_date", now.date);
+    const byDate = new Map((logs ?? []).map((l) => [l.log_date, l.count]));
+    const done = byDate.get(now.date) ?? 0;
     if (done >= s.daily_target) continue;
+
+    // strict sankalp: was any earlier day missed? (the app restarts it on next open)
+    let broken = false;
+    if (s.strict !== false) {
+      const hist: { until: string; target: number }[] = s.target_history ?? [];
+      for (let i = 0; i < span; i++) {
+        const d = new Date(Date.parse(s.start_date + "T00:00:00Z") + i * 86400000).toISOString().slice(0, 10);
+        if (excused.includes(d)) continue;
+        let target = s.daily_target;
+        for (let k = hist.length - 1; k >= 0; k--) { if (d < hist[k].until) target = hist[k].target; else break; }
+        if ((byDate.get(d) ?? 0) < target) { broken = true; break; }
+      }
+    }
 
     const due = (t: string | null, last: string | null) =>
       t && last !== now.date && now.minutes >= toMin(t) && now.minutes - toMin(t) < 60;
@@ -110,15 +124,17 @@ async function tick() {
     const progress = s.daily_target > 1 ? ` · ${done}/${s.daily_target} ${s.unit}` : "";
     if (due(s.reminder_time, s.last_reminded_on)) {
       sent += await pushTo([s.member_id], {
-        title: `🙏 ${s.title}`,
-        body: `Day ${day} of ${s.total_days}${progress}. ${jaiOf(s.kind)}`,
+        title: broken ? `🔁 ${s.title} — Day 1 again` : `🙏 ${s.title}`,
+        body: broken ? `A day was missed, so the sankalp begins again today. ${jaiOf(s.kind)}` : `Day ${day} of ${s.total_days}${progress}. ${jaiOf(s.kind)}`,
         tag: `remind-${s.id}`, url: "./",
       });
       await db.from("sk_sadhanas").update({ last_reminded_on: now.date }).eq("id", s.id);
     } else if (due(s.nudge_time, s.last_nudged_on)) {
       sent += await pushTo([s.member_id], {
         title: `⏳ ${s.title} still pending`,
-        body: `Day ${day} isn't complete yet${progress}. A few minutes keeps the sankalp unbroken.`,
+        body: broken ? `Begin again today — open Sankalp to start Day 1.` : s.strict !== false
+          ? `Day ${day} isn't complete yet${progress}. Missing today restarts the sankalp from Day 1.`
+          : `Day ${day} isn't complete yet${progress}. A few minutes keeps the sankalp unbroken.`,
         tag: `remind-${s.id}`, url: "./",
       });
       await db.from("sk_sadhanas").update({ last_nudged_on: now.date }).eq("id", s.id);
