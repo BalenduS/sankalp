@@ -177,7 +177,8 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .rcard .inv{font-size:.72em;color:var(--saffron);margin-bottom:6px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
 .rcard .opener{font-size:1.15em;font-weight:700;color:var(--deep);margin-bottom:16px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
 .reader:not(.is-cards) .inv{text-align:center;font-size:.8em;color:var(--deep);margin-bottom:6px}
-.reader:not(.is-cards) .opener{text-align:center;font-weight:600;font-size:1.05em;color:var(--deep);margin-bottom:18px}
+.reader:not(.is-cards) .opener{text-align:center;font-weight:600;font-size:1.05em;color:var(--deep);margin-bottom:18px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
+.tel .opener,.tel .inv{font-family:"Noto Serif Telugu",serif}
 .iti{margin-top:14px;font-size:.85em}
 .ctext .alt{font-size:.6em}
 .cnav{display:flex;gap:10px}
@@ -334,6 +335,22 @@ const SAPTASHLOKI_TE = {
 };
 // Telugu chaupais exactly as supplied by Balendu (bracketed text = alternate readings, shown as notes)
 const CHALISA_TE_VERSES = [["జయ హనుమాన జ్ఞాన గుణ సాగర ।","జయ కపీశ తిహు లోక ఉజాగర ॥ 1 ॥"],["రామదూత అతులిత బలధామా ।","అంజని పుత్ర పవనసుత నామా ॥ 2 ॥"],["మహావీర విక్రమ బజరంగీ ।","కుమతి నివార సుమతి కే సంగీ ॥3 ॥"],["కంచన వరణ విరాజ సువేశా ।","కానన కుండల కుంచిత కేశా ॥ 4 ॥"],["హాథవజ్ర ఔ ధ్వజా విరాజై । [ఔరు]","కాంధే మూంజ జనేవూ సాజై ॥ 5॥"],["శంకర సువన కేసరీ నందన । [శంకర స్వయం]","తేజ ప్రతాప మహాజగ వందన ॥ 6 ॥"],["విద్యావాన గుణీ అతి చాతుర ।","రామ కాజ కరివే కో ఆతుర ॥ 7 ॥"],["ప్రభు చరిత్ర సునివే కో రసియా ।","రామలఖన సీతా మన బసియా ॥ 8॥"],["సూక్ష్మ రూపధరి సియహి దిఖావా ।","వికట రూపధరి లంక జలావా ॥ 9 ॥"],["భీమ రూపధరి అసుర సంహారే ।","రామచంద్ర కే కాజ సంవారే ॥ 10 ॥"],["లాయ సంజీవన లఖన జియాయే ।","శ్రీ రఘువీర హరషి ఉరలాయే ॥ 11 ॥"],["రఘుపతి కీన్హీ బహుత బడాయీ (ఈ) ।","తుమ మమ ప్రియ భరత సమ భాయీ ॥ 12 ॥"],["సహస్ర వదన తుమ్హరో యశగావై ।","అస కహి శ్రీపతి కంఠ లగావై ॥ 13 ॥"],["సనకాదిక బ్రహ్మాది మునీశా ।","నారద శారద సహిత అహీశా ॥ 14 ॥"],["యమ కుబేర దిగపాల జహాం తే ।","కవి కోవిద కహి సకే కహాం తే ॥ 15 ॥"],["తుమ ఉపకార సుగ్రీవహి కీన్హా ।","రామ మిలాయ రాజపద దీన్హా ॥ 16 ॥"],["తుమ్హరో మంత్ర విభీషణ మానా ।","లంకేశ్వర భయే సబ జగ జానా ॥ 17 ॥"],["యుగ సహస్ర యోజన పర భానూ ।","లీల్యో తాహి మధుర ఫల జానూ ॥ 18 ॥"],["ప్రభు ముద్రికా మేలి ముఖ మాహీ ।","జలధి లాంఘి గయే అచరజ నాహీ ॥ 19 ॥"],["దుర్గమ కాజ జగత కే జేతే ।","సుగమ అనుగ్రహ తుమ్హరే తేతే ॥ 20 ॥"],["రామ దుఆరే తుమ రఖవారే ।","హోత న ఆజ్ఞా బిను పైసారే ॥ 21 ॥"],["సబ సుఖ లహై తుమ్హారీ శరణా ।","తుమ రక్షక కాహూ కో డర నా ॥ 22 ॥"],["ఆపన తేజ సమ్హారో ఆపై ।","తీనోం లోక హాంక తే కాంపై ॥ 23 ॥"],["భూత పిశాచ నికట నహి ఆవై ।","మహవీర జబ నామ సునావై ॥ 24 ॥"],["నాసై రోగ హరై సబ పీరా ।","జపత నిరంతర హనుమత వీరా ॥ 25 ॥"],["సంకట సే హనుమాన ఛుడావై ।","మన క్రమ వచన ధ్యాన జో లావై ॥ 26 ॥"],["సబ పర రామ తపస్వీ రాజా ।","తినకే కాజ సకల తుమ సాజా ॥ 27 ॥"],["ఔర మనోరథ జో కోయి లావై ।","తాసు అమిత జీవన ఫల పావై ॥ 28 ॥"],["చారో యుగ ప్రతాప తుమ్హారా ।","హై పరసిద్ధ జగత ఉజియారా ॥ 29 ॥"],["సాధు సంత కే తుమ రఖవారే ।","అసుర నికందన రామ దులారే ॥ 30 ॥"],["అష్టసిద్ధి నవ నిధి కే దాతా ।","అస వర దీన్హ జానకీ మాతా ॥ 31 ॥"],["రామ రసాయన తుమ్హారే పాసా ।","సదా రహో రఘుపతి కే దాసా ॥ 32 ॥ [సాద రహో]"],["తుమ్హరే భజన రామకో పావై ।","జన్మ జన్మ కే దుఖ బిసరావై ॥ 33 ॥"],["అంత కాల రఘుపతి పురజాయీ । [రఘువర]","జహాం జన్మ హరిభక్త కహాయీ ॥ 34 ॥"],["ఔర దేవతా చిత్త న ధరయీ ।","హనుమత సేయి సర్వ సుఖ కరయీ ॥ 35 ॥"],["సంకట క(హ)టై మిటై సబ పీరా ।","జో సుమిరై హనుమత బల వీరా ॥ 36 ॥"],["జై జై జై హనుమాన గోసాయీ ।","కృపా కరహు గురుదేవ కీ నాయీ ॥ 37 ॥"],["యహ శత వార పాఠ కర కోయీ । [జో]","ఛూటహి బంది మహా సుఖ హోయీ ॥ 38 ॥"],["జో యహ పడై హనుమాన చాలీసా ।","హోయ సిద్ధి సాఖీ గౌరీశా ॥ 39 ॥"],["తులసీదాస సదా హరి చేరా ।","కీజై నాథ హృదయ మహ డేరా ॥ 40 ॥"]];
+// Gita Press, Gorakhpur — Stotraratnavali, no. 61 (pp. 219–220)
+const GANESHA = {
+  title: 'सङ्कटनाशनगणेशस्तोत्रम्',
+  open: 'नारद उवाच',
+  verses: [
+    'प्रणम्य शिरसा देवं गौरीपुत्रं विनायकम्।\nभक्तावासं स्मरेन्नित्यमायुःकामार्थसिद्धये॥',
+    'प्रथमं वक्रतुण्डं च एकदन्तं द्वितीयकम्।\nतृतीयं कृष्णपिङ्गाक्षं गजवक्त्रं चतुर्थकम्॥',
+    'लम्बोदरं पञ्चमं च षष्ठं विकटमेव च।\nसप्तमं विघ्नराजं च धूम्रवर्णं तथाष्टमम्॥',
+    'नवमं भालचन्द्रं च दशमं तु विनायकम्।\nएकादशं गणपतिं द्वादशं तु गजाननम्॥',
+    'द्वादशैतानि नामानि त्रिसन्ध्यं यः पठेन्नरः।\nन च विघ्नभयं तस्य सर्वसिद्धिकरं प्रभो॥',
+    'विद्यार्थी लभते विद्यां धनार्थी लभते धनम्।\nपुत्रार्थी लभते पुत्रान्मोक्षार्थी लभते गतिम्॥',
+    'जपेद्गणपतिस्तोत्रं षड्भिर्मासैः फलं लभेत्।\nसंवत्सरेण सिद्धिं च लभते नात्र संशयः॥',
+    'अष्टभ्यो ब्राह्मणेभ्यश्च लिखित्वा यः समर्पयेत्।\nतस्य विद्या भवेत्सर्वा गणेशस्य प्रसादतः॥',
+  ],
+  close: '॥ इति श्रीनारदपुराणे सङ्कटनाशनगणेशस्तोत्रं सम्पूर्णम् ॥',
+};
 // Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
 function toTelugu(s) {
   const t = s
@@ -363,6 +380,12 @@ const KINDS = {
     { n: 'Navaratri', days: 9, count: 108, d: '108 a day · 9 nights' },
     { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
     { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
+  ] },
+  ganesha: { title: 'Sankata Nashana Ganesha Stotram', unit: 'paath', emoji: '🐘', reader: 'ganesha', deity: 'ganesha', plans: [
+    { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
+    { n: 'Trisandhya', days: 40, count: 3, d: 'Morning, noon, evening · 40 days' },
+    { n: 'Six months', days: 180, count: 1, d: 'Phala-shruti: fruit in 6 months' },
+    { n: 'One year', days: 365, count: 1, d: 'Phala-shruti: siddhi in a year' },
   ] },
   sundarkand: { title: 'Sundarkand', unit: 'paath', emoji: '📿', deity: 'hanuman', plans: [
     { n: '11 days', days: 11, count: 1, d: '1 paath a day' }, { n: '21 days', days: 21, count: 1, d: '1 paath a day' },
@@ -402,6 +425,15 @@ const DEITY = {
     'On the last day, offer prasad (kheer or fruit), recite Durga Ashtottara if you can, and feed a girl child or someone in need.',
   ] },
 };
+DEITY.ganesha = { days: [3], note: '★ Wednesday is Ganapati\'s day. Chaturthi, especially Sankashti Chaturthi, is also auspicious.', guide: [
+  'From the Narada Purana: Narada teaches twelve names of Ganesha — Vakratunda, Ekadanta, Krishnapingaksha, Gajavaktra, Lambodara, Vikata, Vighnaraja, Dhumravarna, Bhalachandra, Vinayaka, Ganapati and Gajanana.',
+  'Begin on a Wednesday, a Chaturthi, or a Sankashti Chaturthi (the 4th day after Purnima), ideally after the morning bath.',
+  'Sit before Ganapati, offer durva grass or a modak if you can, light a diya and take the sankalp: your name, the count, the days and your intention.',
+  'The stotram itself says to recite it at the three sandhyas — dawn, noon and dusk — for freedom from obstacles (shloka 5).',
+  'Its phala-shruti promises results in six months and siddhi in one year (shloka 7), so 180-day and 365-day plans are offered too.',
+  'If a day is missed, the app lets you extend or restart.',
+  'On completion, offer modak or laddu, and as shloka 8 suggests, share the stotram — write it out for others or teach it.',
+] };
 const deityOf = (k) => DEITY[(KINDS[k] || {}).deity] || DEITY.hanuman;
 
 // ------------------------------------------------------------------ storage + state
@@ -567,6 +599,7 @@ function tap(id, delta) {
     if (todayDot) todayDot.classList.add('justdone');
   }
 }
+const jaiOf = (s) => ({ devi: 'Jai Mata Di', ganesha: 'Jai Ganesha' })[kindOf(s).deity] || 'Jai Shri Ram';
 function dayComplete(s) {
   const n = dayNo(s, today());
   if (navigator.vibrate) navigator.vibrate([30, 60, 30, 60, 80]);
@@ -574,14 +607,14 @@ function dayComplete(s) {
   const half = !last && doneCount(s) === Math.ceil(s.total_days / 2);
   const streak = streakOf(s);
   const milestone = !last && [7, 11, 21, 40, 41, 51, 108].includes(streak);
-  const jai = kindOf(s).deity === 'devi' ? 'Jai Mata Di' : 'Jai Shri Ram';
+  const jai = jaiOf(s);
   if (last) { celebrate('Sankalp complete!', `${s.total_days} days of ${s.title} 🙏`, '🏆'); petalRain(60); }
   else if (half) { celebrate('Halfway there!', `${doneCount(s)} of ${s.total_days} days · ${jai}`, '🌗'); petalRain(40); }
   else if (milestone) { celebrate(`${streak} days in a row!`, jai, '🔥'); petalRain(40); }
   else { celebrate(`Day ${n} complete`, jai, '🪔'); petalRain(22); }
   callFn({ action: 'cheer',
     title: last ? `🎉 ${me()?.name} completed the sankalp!` : `🚩 ${me()?.name} finished today's ${s.title}`,
-    body: last ? `${s.total_days} days of ${s.title}. Jai Hanuman!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
+    body: last ? `${s.total_days} days of ${s.title}. ${jaiOf(s)}!` : `Day ${n} of ${s.total_days} done. Your turn 🙏` }).catch(() => {});
   if (last) updateSadhana(s, { status: 'completed', completed_at: new Date().toISOString() });
 }
 function autoComplete() {
@@ -1121,6 +1154,12 @@ function readerUnits(s, skipIntro) {
     U.push({ cls: 'doha', label: '', html: x(T.close), end: true });
     return { title: te ? T.title : tr(T.title), units: U };
   }
+  if (kindOf(s).reader === 'ganesha') {
+    const G = GANESHA;
+    G.verses.forEach((v, i) => U.push({ cls: 'verse', top: i === 0 ? `<div class="opener">${tr(G.title)}</div>` : '', label: i === 0 ? tr(G.open) : `${tr('श्लोक')} ${i + 1}`, head: i === 0 ? tr(G.open) : null, html: brk(v).replace(/\s*॥$/, ` ॥ ${i + 1} ॥`) }));
+    U.push({ cls: 'doha', label: '', html: tr(G.close), end: true });
+    return { title: tr(G.title), units: U };
+  }
   const L = CHALISA.open.map(tr);
   U.push({ cls: 'doha', top: `<div class="inv">${tr('॥ श्रीहनूमते नमः ॥')}</div>`, label: tr('दोहा'), html: L.slice(0, 2).join('<br>') });
   U.push({ cls: 'doha', label: tr('दोहा'), html: L.slice(2).join('<br>'), cont: true });
@@ -1133,7 +1172,7 @@ function readerUnits(s, skipIntro) {
 }
 function scrollHtml(U) {
   return U.map((u) => {
-    if (u.cls === 'verse') return `${u.head ? `<div class="doha" style="margin:-6px 0 14px"><small>${u.head}</small></div>` : ''}<div class="verse">${u.no ? `<span class="no">${u.no}</span>` : ''}<span class="tx">${u.html}</span></div>`;
+    if (u.cls === 'verse') return `${u.top || ''}${u.head ? `<div class="doha" style="margin:-6px 0 14px"><small>${u.head}</small></div>` : ''}<div class="verse">${u.no ? `<span class="no">${u.no}</span>` : ''}<span class="tx">${u.html}</span></div>`;
     return `${u.top || ''}<div class="doha"${u.cont ? ' style="margin-top:-18px"' : ''}>${u.label && !u.cont ? `<small>${u.label}</small>` : ''}${u.html}</div>`;
   }).join('');
 }

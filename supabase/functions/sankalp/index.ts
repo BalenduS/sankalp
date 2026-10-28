@@ -80,6 +80,7 @@ function localNow(tz: string) {
   );
   return { date: `${p.year}-${p.month}-${p.day}`, minutes: +p.hour * 60 + +p.minute };
 }
+const jaiOf = (kind: string) => ({ saptashloki: "Jai Mata Di!", ganesha: "Jai Ganesha!", custom: "🙏" } as Record<string, string>)[kind] || "Jai Shri Ram!";
 const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const dayDiff = (a: string, b: string) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000);
 
@@ -110,7 +111,7 @@ async function tick() {
     if (due(s.reminder_time, s.last_reminded_on)) {
       sent += await pushTo([s.member_id], {
         title: `🙏 ${s.title}`,
-        body: `Day ${day} of ${s.total_days}${progress}. Jai Shri Ram!`,
+        body: `Day ${day} of ${s.total_days}${progress}. ${jaiOf(s.kind)}`,
         tag: `remind-${s.id}`, url: "./",
       });
       await db.from("sk_sadhanas").update({ last_reminded_on: now.date }).eq("id", s.id);
