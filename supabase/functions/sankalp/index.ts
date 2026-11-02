@@ -80,7 +80,7 @@ function localNow(tz: string) {
   );
   return { date: `${p.year}-${p.month}-${p.day}`, minutes: +p.hour * 60 + +p.minute };
 }
-const jaiOf = (kind: string) => ({ saptashloki: "Jai Mata Di!", ganesha: "Jai Ganesha!", custom: "🙏" } as Record<string, string>)[kind] || "Jai Shri Ram!";
+const jaiOf = (kind: string) => ({ saptashloki: "Jai Mata Di!", ganesha: "Jai Ganesha!", vishnu: "Om Namo Narayanaya!", custom: "🙏" } as Record<string, string>)[kind] || "Jai Shri Ram!";
 const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
 const dayDiff = (a: string, b: string) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 86400000);
 
