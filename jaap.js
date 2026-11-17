@@ -60,7 +60,7 @@
     clearTimeout(J.saveTimer);
     if (now) LS.set('jaap', D()); else J.saveTimer = setTimeout(() => LS.set('jaap', D()), 500);
   }
-  const num = C.fmtNum, dur = C.fmtDuration;
+  const num = C.fmtNum, dur = (sec) => (sec > 0 ? C.fmtDuration(sec) : '–');
   const tz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata'; } catch { return 'Asia/Kolkata'; } };
   const hourOf = (isoStr) => new Date(isoStr).getHours();
   const tm = (isoStr) => new Date(isoStr).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
@@ -827,7 +827,7 @@
     if (S.tab !== 'jaap') return;
     const bars = document.querySelectorAll('.jp-bar i[data-h]');
     if (bars.length) requestAnimationFrame(() => requestAnimationFrame(() => bars.forEach((b) => { b.style.height = b.dataset.h + '%'; })));
-    ['jp-scroll', 'jp-heat'].forEach((k) => { const el = document.getElementById(k); if (el && !el.dataset.done) { el.scrollLeft = el.scrollWidth; el.dataset.done = '1'; } });
+    ['jp-scroll', 'jp-heat'].forEach((k) => { const el = document.getElementById(k); if (el && !el.dataset.done) { if (el.scrollWidth > el.clientWidth + 1) el.scrollLeft = el.scrollWidth; el.dataset.done = '1'; } });
   }
   // deep links from a notification: ?jaap=remind&r=<id> | journey | reminders
   function openLink(url) {

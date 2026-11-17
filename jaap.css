@@ -86,15 +86,17 @@ nav.tabs button.on{color:var(--ink)}
 .jp-chart .scroll{overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .jp-chart .scroll::-webkit-scrollbar{display:none}
 .jp-bars{display:flex;align-items:flex-end;gap:2px;height:168px;min-width:100%;border-bottom:1px solid var(--line);position:relative}
-.jp-bar{flex:1 0 9px;min-width:9px;max-width:38px;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative;cursor:pointer}
+.jp-bar{flex:1 0 5px;min-width:5px;max-width:38px;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative;cursor:pointer}
 .jp-bar i{display:block;width:100%;max-width:22px;border-radius:4px 4px 0 0;background:var(--gold2);height:0;transition:height .55s cubic-bezier(.2,.8,.2,1),background .2s;min-height:0}
 .jp-bar.has i{min-height:3px}
 .jp-bar.sel i{background:var(--goldDeep)}
 .jp-bar:hover i{background:var(--gold)}
 .jp-bar.sel::after{content:"";position:absolute;bottom:-7px;left:50%;width:5px;height:5px;border-radius:50%;background:var(--goldDeep);transform:translateX(-50%)}
 .jp-axis{display:flex;gap:2px;min-width:100%;margin-top:9px}
-.jp-axis span{flex:1 0 9px;min-width:9px;max-width:38px;font-size:10px;color:var(--muted);text-align:center;white-space:nowrap;overflow:visible;height:13px;position:relative}
+.jp-axis span{flex:1 0 5px;min-width:5px;max-width:38px;font-size:10px;color:var(--muted);text-align:center;white-space:nowrap;overflow:visible;height:13px;position:relative}
 .jp-axis span b{position:absolute;left:50%;transform:translateX(-50%);font-weight:500}
+.jp-axis span:first-child b{left:0;transform:none}
+.jp-axis span:last-child b{left:auto;right:0;transform:none}
 .jp-ymax{position:absolute;top:-6px;right:0;font-size:10.5px;color:var(--muted);background:var(--card);padding:0 0 0 6px;pointer-events:none}
 .jp-detail{margin-top:14px;padding:13px 14px;border-radius:14px;background:var(--bg);border:1px solid var(--line);font-size:14px;animation:fade .25s}
 .jp-detail .d{font-family:var(--serif);font-size:20px;font-weight:600}
