@@ -1,5 +1,5 @@
-const VERSION = 'sankalp-v16';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png', './icons/logo.svg', './vendor/supabase.min.js'];
+const VERSION = 'sankalp-v17';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png', './icons/logo.svg', './vendor/supabase.min.js', './jaap.css', './jaap-core.js', './jaap.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -39,14 +39,18 @@ self.addEventListener('push', (e) => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { title: 'Sankalp', body: e.data && e.data.text() }; }
   e.waitUntil((async () => {
-    await self.registration.showNotification(d.title || 'Sankalp', {
+    const opts = {
       body: d.body || '',
       tag: d.tag || 'sankalp',
-      renotify: true,
+      renotify: !d.silent,
+      silent: !!d.silent,
       icon: 'icons/icon-192.png',
       badge: 'icons/icon-96.png',
-      data: { url: d.url || './' },
-    });
+      data: { url: d.url || './', snooze: d.snooze || null },
+    };
+    // action buttons (Begin / Snooze) are shown where the platform supports them — Android, not iPhone
+    if (Array.isArray(d.actions) && d.actions.length && 'actions' in Notification.prototype) opts.actions = d.actions;
+    await self.registration.showNotification(d.title || 'Sankalp', opts);
     const cs = await self.clients.matchAll({ type: 'window' });
     cs.forEach((c) => c.postMessage({ type: 'refresh' }));
   })());
@@ -54,10 +58,16 @@ self.addEventListener('push', (e) => {
 
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
-  const target = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  const data = e.notification.data || {};
+  if (e.action === 'snooze' && data.snooze) {
+    e.waitUntil(fetch(data.snooze.fn, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'snooze', log_id: data.snooze.log_id, token: data.snooze.token }) }).catch(() => {}));
+    return;
+  }
+  const target = new URL(data.url || './', self.registration.scope).href;
   e.waitUntil((async () => {
     const cs = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const c of cs) { if (c.url.startsWith(self.registration.scope)) { c.postMessage({ type: 'refresh' }); return c.focus(); } }
+    for (const c of cs) { if (c.url.startsWith(self.registration.scope)) { c.postMessage({ type: 'refresh' }); c.postMessage({ type: 'jaap-open', url: target }); return c.focus(); } }
     return self.clients.openWindow(target);
   })());
 });
