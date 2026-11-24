@@ -374,7 +374,7 @@ const VSN = [["full", "प्रार्थना", "नारायणं न�
 // Each row: [label, text, number, isIntro]. Intro rows are skipped on repeat paaths the same day.
 const DEVI_TEXTS = {
   argala: {
-    title: 'अथार्गलास्तोत्रम्', name: 'अर्गलास्तोत्रम्',
+    title: 'अथार्गलास्तोत्रम्', name: 'अर्गलास्तोत्रम्', short: 'अर्गला',
     rows: [
       ['विनियोगः', 'ॐ अस्य श्रीअर्गलास्तोत्रमन्त्रस्य विष्णुर्ऋषिः, अनुष्टुप् छन्दः, श्रीमहालक्ष्मीर्देवता, श्रीजगदम्बाप्रीतये सप्तशतीपाठाङ्गत्वेन जपे विनियोगः ॥\nॐ नमश्चण्डिकायै ॥', null, true],
       ['मार्कण्डेय उवाच', 'ॐ जयन्ती मङ्गला काली भद्रकाली कपालिनी।\nदुर्गा क्षमा शिवा धात्री स्वाहा स्वधा नमोऽस्तु ते॥', 1],
@@ -405,8 +405,29 @@ const DEVI_TEXTS = {
       ['', 'इति देव्या अर्गलास्तोत्रं सम्पूर्णम्।', null],
     ],
   },
+  keelakam: {
+    title: 'अथ कीलकम्', name: 'कीलकम्', short: 'कीलकम्',
+    rows: [
+      ['विनियोगः', 'ॐ अस्य श्रीकीलकमन्त्रस्य शिव ऋषिः, अनुष्टुप् छन्दः, श्रीमहासरस्वती देवता, श्रीजगदम्बाप्रीत्यर्थं सप्तशतीपाठाङ्गत्वेन जपे विनियोगः ॥\nॐ नमश्चण्डिकायै ॥', null, true],
+      ['मार्कण्डेय उवाच', 'ॐ विशुद्धज्ञानदेहाय त्रिवेदीदिव्यचक्षुषे।\nश्रेयःप्राप्तिनिमित्ताय नमः सोमार्धधारिणे॥', 1],
+      ['', 'सर्वमेतद्विजानीयान्मन्त्राणामभिकीलकम्।\nसोऽपि क्षेममवाप्नोति सततं जाप्यतत्परः॥', 2],
+      ['', 'सिद्ध्यन्त्युच्चाटनादीनि वस्तूनि सकलान्यपि।\nएतेन स्तुवतां देवी स्तोत्रमात्रेण सिद्ध्यति॥', 3],
+      ['', 'न मन्त्रो नौषधं तत्र न किञ्चिदपि विद्यते।\nविना जाप्येन सिद्ध्येत सर्वमुच्चाटनादिकम्॥', 4],
+      ['', 'समग्राण्यपि सिद्ध्यन्ति लोकशङ्कामिमां हरः।\nकृत्वा निमन्त्रयामास सर्वमेवमिदं शुभम्॥', 5],
+      ['', 'स्तोत्रं वै चण्डिकायास्तु तच्च गुप्तं चकार सः।\nसमाप्तिर्न च पुण्यस्य तां यथावन्नियन्त्रणाम्॥', 6],
+      ['', 'सोऽपि क्षेममवाप्नोति सर्वमेवं न संशयः।\nकृष्णायां वा चतुर्दश्यामष्टम्यां वा समाहितः॥', 7],
+      ['', 'ददाति प्रतिगृह्णाति नान्यथैषा प्रसीदति।\nइत्थंरूपेण कीलेन महादेवेन कीलितम्॥', 8],
+      ['', 'यो निष्कीलां विधायैनां नित्यं जपति संस्फुटम्।\nस सिद्धः स गणः सोऽपि गन्धर्वो जायते नरः॥', 9],
+      ['', 'न चैवाप्यटतस्तस्य भयं क्वापीह जायते।\nनापमृत्युवशं याति मृतो मोक्षमवाप्नुयात्॥', 10],
+      ['', 'ज्ञात्वा प्रारभ्य कुर्वीत न कुर्वाणो विनश्यति।\nततो ज्ञात्वैव सम्पन्नमिदं प्रारभ्यते बुधैः॥', 11],
+      ['', 'सौभाग्यादि च यत्किञ्चिद् दृश्यते ललनाजने।\nतत्सर्वं तत्प्रसादेन तेन जाप्यमिदं शुभम्॥', 12],
+      ['', 'शनैस्तु जप्यमानेऽस्मिन् स्तोत्रे सम्पत्तिरुच्चकैः।\nभवत्येव समग्रापि ततः प्रारभ्यमेव तत्॥', 13],
+      ['', 'ऐश्वर्यं यत्प्रसादेन सौभाग्यारोग्यसम्पदः।\nशत्रुहानिः परो मोक्षः स्तूयते सा न किं जनैः॥ ॐ', 14],
+      ['', 'इति देव्याः कीलकस्तोत्रं सम्पूर्णम्।', null],
+    ],
+  },
   devisuktam: {
-    title: 'अथ तन्त्रोक्तं देवीसूक्तम्', name: 'तन्त्रोक्तं देवीसूक्तम्',
+    title: 'अथ तन्त्रोक्तं देवीसूक्तम्', name: 'तन्त्रोक्तं देवीसूक्तम्', short: 'देवीसूक्तम्',
     rows: [
       ['', 'नमो देव्यै महादेव्यै शिवायै सततं नमः।\nनमः प्रकृत्यै भद्रायै नियताः प्रणताः स्म ताम्॥', 1],
       ['', 'रौद्रायै नमो नित्यायै गौर्यै धात्र्यै नमो नमः।\nज्योत्स्नायै चेन्दुरूपिण्यै सुखायै सततं नमः॥', 2],
@@ -424,7 +445,7 @@ const DEVI_TEXTS = {
     ],
   },
   kunjika: {
-    title: 'सिद्धकुञ्जिकास्तोत्रम्', name: 'सिद्धकुञ्जिकास्तोत्रम्',
+    title: 'सिद्धकुञ्जिकास्तोत्रम्', name: 'सिद्धकुञ्जिकास्तोत्रम्', short: 'कुञ्जिका',
     rows: [
       ['शिव उवाच', 'शृणु देवि प्रवक्ष्यामि कुञ्जिकास्तोत्रमुत्तमम्।\nयेन मन्त्रप्रभावेण चण्डीजापः शुभो भवेत्॥', 1, true],
       ['', 'न कवचं नार्गलास्तोत्रं कीलकं न रहस्यकम्।\nन सूक्तं नापि ध्यानं च न न्यासो न च वार्चनम्॥', 2, true],
@@ -478,37 +499,11 @@ const KINDS = {
     { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
     { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
   ] },
-  devi_trayam: { title: 'Argala · Devi Suktam · Kunjika', unit: 'paath', emoji: '🪔', reader: 'devitext', deity: 'devi', texts: ['argala', 'devisuktam', 'kunjika'],
-    about: 'All three angas of the Durga Saptashati read together every day: Argala Stotram, then Tantrokta Devi Suktam, then Siddha Kunjika Stotram. One paath is all three, read straight through.',
+  devi_trayam: { title: 'Argala · Keelakam · Devi Suktam · Kunjika', unit: 'paath', emoji: '🪔', reader: 'devitext', deity: 'devi', texts: ['argala', 'keelakam', 'devisuktam', 'kunjika'],
+    about: 'Four angas of the Durga Saptashati read together every day, in the Gita Press order: Argala Stotram, Keelakam, Tantrokta Devi Suktam, then Siddha Kunjika Stotram. One paath is all four, read straight through.',
     plans: [
-    { n: '3 months', months: 3, count: 1, d: 'All three, once a day' }, { n: 'Nitya', days: 40, count: 1, d: 'All three · 40 days' },
-    { n: '9 months', months: 9, count: 1, d: 'All three, once a day' }, { n: 'Navaratri', days: 9, count: 1, d: 'All three · 9 nights' },
-  ] },
-  devi_series: { title: 'One after another: Argala → Devi Suktam → Kunjika', unit: 'paath', emoji: '🪜', deity: 'devi', series: ['argala', 'devisuktam', 'kunjika'],
-    about: 'A path through three angas of the Durga Saptashati, one after another: Argala Stotram, then Tantrokta Devi Suktam, then Siddha Kunjika Stotram. Each stage begins the day after the previous one is complete. A missed day restarts only the stage you are in.',
-    plans: [
-    { n: '3 months each', months: 3, count: 1, d: '9 months in all' },
-    { n: '40 days each', days: 40, count: 1, d: '120 days in all' },
-    { n: '1 month each', months: 1, count: 1, d: '3 months in all' },
-    { n: '21 days each', days: 21, count: 1, d: '63 days in all' },
-  ] },
-  argala: { title: 'Argala Stotram', unit: 'paath', emoji: '🗝️', reader: 'devitext', deity: 'devi',
-    about: 'Argala (“the bolt”) is one of the angas recited with the Durga Saptashati, from the Markandeya Purana. Its refrain — रूपं देहि जयं देहि यशो देहि द्विषो जहि — asks the Devi for form, victory and fame, and to remove what stands against us.',
-    plans: [
-    { n: '3 months', months: 3, count: 1, d: '1 paath a day' }, { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
-    { n: 'Navaratri', days: 9, count: 11, d: '11 a day · 9 nights' }, { n: '21-day sankalp', days: 21, count: 3, d: '3 paaths a day' },
-  ] },
-  devisuktam: { title: 'Tantrokta Devi Suktam', unit: 'paath', emoji: '🌺', reader: 'devitext', deity: 'devi',
-    about: 'The Tantrokta Devi Suktam is the hymn the devas sing in chapter 5 of the Devi Mahatmya — “या देवी सर्वभूतेषु…”. Gita Press notes it is recited at the close of a Saptashati paath.',
-    plans: [
-    { n: '3 months', months: 3, count: 1, d: '1 paath a day' }, { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
-    { n: 'Navaratri', days: 9, count: 11, d: '11 a day · 9 nights' }, { n: '21-day sankalp', days: 21, count: 3, d: '3 paaths a day' },
-  ] },
-  kunjika: { title: 'Siddha Kunjika Stotram', unit: 'paath', emoji: '🔑', reader: 'devitext', deity: 'devi',
-    about: 'From the Rudrayamala (Gauri Tantra): Shiva tells Parvati that reciting the Kunjika alone gives the fruit of the whole Saptashati. It holds bija mantras — read them exactly as written; as Gita Press notes, knowing their meaning is neither possible nor needed, the japa itself is enough.',
-    plans: [
-    { n: '3 months', months: 3, count: 1, d: '1 paath a day' }, { n: 'Nitya', days: 40, count: 1, d: '1 paath a day · 40 days' },
-    { n: 'Navaratri', days: 9, count: 11, d: '11 a day · 9 nights' }, { n: '21-day sankalp', days: 21, count: 3, d: '3 paaths a day' },
+    { n: '3 months', months: 3, count: 1, d: 'All four, once a day' }, { n: 'Nitya', days: 40, count: 1, d: 'All four · 40 days' },
+    { n: '9 months', months: 9, count: 1, d: 'All four, once a day' }, { n: 'Navaratri', days: 9, count: 1, d: 'All four · 9 nights' },
   ] },
   vishnu: { title: 'Vishnu Sahasranama', unit: 'paath', emoji: '🪷', reader: 'vishnu', deity: 'vishnu', plans: [
     { n: 'Nitya', days: 40, count: 1, d: '1 parayana a day · 40 days' },
@@ -1457,7 +1452,7 @@ function readerUnits(s, skipIntro) {
         first = false;
       });
     });
-    return { title: multi ? tr(parts.map((k) => DEVI_TEXTS[k].name.replace('स्तोत्रम्', '')).join(' · ')) : tr(DEVI_TEXTS[parts[0]].name), units: U };
+    return { title: multi ? tr(parts.map((k) => DEVI_TEXTS[k].short).join(' · ')) : tr(DEVI_TEXTS[parts[0]].name), units: U };
   }
   if (kindOf(s).reader === 'vishnu') {
     const full = S.vsnFull;
@@ -1496,7 +1491,7 @@ function scrollHtml(U) {
 }
 function cardsHtml(U) {
   return `<div class="rprog"><i id="rbar"></i></div><div class="cards" id="cards">${U.map((u, i) =>
-    `<section class="rcard${u.cls === 'verse' ? ' v' : ''}${u.html.replace(/<[^>]+>/g, '').length > 150 ? ' long' : ''}" data-i="${i}"><div class="rcard-in">
+    `<section class="rcard${u.cls === 'verse' ? ' v' : ''}${u.html.replace(/<[^>]+>/g, '').length > 120 ? ' long' : ''}" data-i="${i}"><div class="rcard-in">
       ${u.top || ''}${u.label ? `<div class="clabel">${u.label}</div>` : ''}<div class="ctext">${u.html}</div>
     </div></section>`).join('')}</div>`;
 }
