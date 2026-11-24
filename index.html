@@ -478,7 +478,13 @@ const KINDS = {
     { n: '21-day sankalp', days: 21, count: 7, d: '7 paaths a day' },
     { n: 'Anushthan', days: 41, count: 11, d: '11 paaths a day · 41 days' },
   ] },
-  devi_series: { title: 'Argala → Devi Suktam → Kunjika', unit: 'paath', emoji: '🪔', deity: 'devi', series: ['argala', 'devisuktam', 'kunjika'],
+  devi_trayam: { title: 'Argala · Devi Suktam · Kunjika', unit: 'paath', emoji: '🪔', reader: 'devitext', deity: 'devi', texts: ['argala', 'devisuktam', 'kunjika'],
+    about: 'All three angas of the Durga Saptashati read together every day: Argala Stotram, then Tantrokta Devi Suktam, then Siddha Kunjika Stotram. One paath is all three, read straight through.',
+    plans: [
+    { n: '3 months', months: 3, count: 1, d: 'All three, once a day' }, { n: 'Nitya', days: 40, count: 1, d: 'All three · 40 days' },
+    { n: '9 months', months: 9, count: 1, d: 'All three, once a day' }, { n: 'Navaratri', days: 9, count: 1, d: 'All three · 9 nights' },
+  ] },
+  devi_series: { title: 'One after another: Argala → Devi Suktam → Kunjika', unit: 'paath', emoji: '🪜', deity: 'devi', series: ['argala', 'devisuktam', 'kunjika'],
     about: 'A path through three angas of the Durga Saptashati, one after another: Argala Stotram, then Tantrokta Devi Suktam, then Siddha Kunjika Stotram. Each stage begins the day after the previous one is complete. A missed day restarts only the stage you are in.',
     plans: [
     { n: '3 months each', months: 3, count: 1, d: '9 months in all' },
@@ -1438,15 +1444,20 @@ function readerUnits(s, skipIntro) {
     return { title: te ? T.title : tr(T.title), units: U };
   }
   if (kindOf(s).reader === 'devitext') {
-    const T = DEVI_TEXTS[s.kind];
-    let first = true;
-    T.rows.forEach(([label, text, no, intro]) => {
-      if (intro && skipIntro) return;
-      const html = tr(text).replace(/\n/g, '<br>').replace(/\s*॥\s*(ॐ)?$/, (m0, om) => no ? ` ॥ ${no} ॥${om ? ' ' + tr('ॐ') : ''}` : ` ॥${om ? ' ' + tr('ॐ') : ''}`);
-      U.push({ cls: no ? 'verse' : 'doha', top: first ? `<div class="opener">${tr(T.title)}</div>` : '', label: label ? tr(label) : '', html, head: first && no ? tr(label || '') || null : null });
-      first = false;
+    const parts = kindOf(s).texts || [s.kind], multi = parts.length > 1;
+    parts.forEach((key, pi) => {
+      const T = DEVI_TEXTS[key];
+      let first = true;
+      T.rows.forEach(([label, text, no, intro]) => {
+        if (intro && skipIntro) return;
+        const html = tr(text).replace(/\n/g, '<br>').replace(/\s*॥\s*(ॐ)?$/, (m0, om) => no ? ` ॥ ${no} ॥${om ? ' ' + tr('ॐ') : ''}` : ` ॥${om ? ' ' + tr('ॐ') : ''}`);
+        const lab = label ? tr(label) : multi && !first ? tr(T.name) : '';
+        U.push({ cls: no ? 'verse' : 'doha', top: first ? `${multi ? `<div class="inv">${pi + 1} / ${parts.length}</div>` : ''}<div class="opener">${tr(T.title)}</div>` : '',
+          label: lab, html, section: multi && first, head: multi && first ? tr(T.name) : (first && no ? tr(label || '') || null : null) });
+        first = false;
+      });
     });
-    return { title: tr(T.name), units: U };
+    return { title: multi ? tr(parts.map((k) => DEVI_TEXTS[k].name.replace('स्तोत्रम्', '')).join(' · ')) : tr(DEVI_TEXTS[parts[0]].name), units: U };
   }
   if (kindOf(s).reader === 'vishnu') {
     const full = S.vsnFull;
@@ -1502,7 +1513,7 @@ function openReader(id, atStart) {
     <div class="rtools"><div class="seg"><button class="${cards ? 'on' : ''}" data-act="rmode" data-id="cards">▢ Cards</button><button class="${cards ? '' : 'on'}" data-act="rmode" data-id="scroll">☰ Scroll</button></div>
       <span class="rcount" id="rcount">${cards ? `1 / ${units.length}` : ''}</span>
       <div class="row" style="gap:6px"><button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></div></div>
-    ${kindOf(s).reader === 'vishnu' ? `<div class="rtools rtools2"><div class="seg"><button class="${S.vsnFull ? '' : 'on'}" data-act="vsnmode" data-id="gp">Gita Press</button><button class="${S.vsnFull ? 'on' : ''}" data-act="vsnmode" data-id="full">Full parayana</button></div>
+    ${kindOf(s).reader === 'vishnu' || units.some((u) => u.section) ? `<div class="rtools rtools2">${kindOf(s).reader === 'vishnu' ? `<div class="seg"><button class="${S.vsnFull ? '' : 'on'}" data-act="vsnmode" data-id="gp">Gita Press</button><button class="${S.vsnFull ? 'on' : ''}" data-act="vsnmode" data-id="full">Full parayana</button></div>` : '<span class="rcount">Jump to</span>'}
       ${cards ? `<select id="rjump" aria-label="Jump to section">${units.map((u, i) => u.section ? `<option value="${i}">${u.head}</option>` : '').join('')}</select>` : ''}</div>` : ''}
     ${cards ? `<div class="body cbody" id="rbody" style="font-size:${S.fs}px">${cardsHtml(units)}</div>`
       : `<div class="body" id="rbody" style="font-size:${S.fs}px">${scrollHtml(units)}</div>`}
