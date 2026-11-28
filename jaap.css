@@ -8,9 +8,9 @@
   --ok:#5F8A55; --okSoft:#E5EEDC; --miss:#B4533C; --missSoft:#F7E4DD;
   --h0:#EEE7D8; --h1:#E3D3A6; --h2:#CFB26B; --h3:#AE8B3C; --h4:#82651F;
   --shadow:0 1px 2px rgba(90,70,20,.04),0 8px 24px rgba(110,85,30,.06);
-  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
 }
-@media (prefers-color-scheme:dark){
+@media (prefers-color-scheme:dark) and (max-width:0px){
   :root{--bg:#16130D;--card:#201C14;--ink:#F3EBDA;--muted:#A99C84;--line:#342D20;--gold:#C9A961;--gold2:#A9873A;--goldSoft:#2E2717;--goldDeep:#E3C98A;
     --ok:#8DB983;--okSoft:#1E2C1B;--miss:#E08A74;--missSoft:#3A1D16;
     --h0:#2A2418;--h1:#4A3D1E;--h2:#75602A;--h3:#A9873A;--h4:#DDBF78;--shadow:0 1px 2px rgba(0,0,0,.4)}
@@ -35,7 +35,7 @@ nav.tabs button.on{color:var(--ink)}
 .floater{text-shadow:none;font-family:var(--serif)}
 .toast{background:var(--ink);color:var(--bg)}
 .center-msg div{font-family:var(--serif);font-weight:600;font-size:26px}
-.center-msg small{font-family:Figtree,system-ui,sans-serif}
+.center-msg small{font-family:Outfit,system-ui,sans-serif}
 .rcard-in{background-image:radial-gradient(circle at 50% -10%,rgba(205,176,106,.18),transparent 55%);box-shadow:0 18px 40px rgba(110,85,30,.10)}
 .cnav .btn.primary.finish,.ring.done .inner{background:var(--goldSoft)}
 .cnav .btn.primary.finish{background:var(--gold);color:#fff}
@@ -65,11 +65,11 @@ nav.tabs button.on{color:var(--ink)}
 .jp-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .jp-tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px;box-shadow:var(--shadow);min-width:0}
 .jp-tile .v{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1.05;margin-top:6px;font-variant-numeric:lining-nums;overflow-wrap:anywhere}
-.jp-tile .v small{font-family:Figtree,system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
+.jp-tile .v small{font-family:Outfit,system-ui,sans-serif;font-size:13px;font-weight:500;color:var(--muted);margin-left:3px}
 .jp-tile .s{font-size:12px;color:var(--muted);margin-top:4px}
 .jp-three{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
 .jp-three>div{min-width:0}
-.jp-three .v{font-family:var(--serif,"Cormorant Garamond",Georgia,serif);font-size:26px;font-weight:600;line-height:1.1}
+.jp-three .v{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1.1}
 .jp-three .l{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3}
 
 /* range chips */

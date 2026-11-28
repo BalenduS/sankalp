@@ -5,7 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sankalp</title>
 <meta name="description" content="Hanuman Chalisa & sadhana tracker for the family">
-<meta name="theme-color" content="#F6F2E9">
+<meta name="theme-color" content="#F3F4F0">
+<script>
+// theme before first paint: 'day' (Morning Light, default), 'night' (Diya Night) or 'auto' (follow the phone)
+(function () {
+  var t = 'day'; try { t = JSON.parse(localStorage.getItem('sk.theme')) || 'day'; } catch (e) {}
+  var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+  var eff = t === 'auto' ? (dark ? 'night' : 'day') : t;
+  document.documentElement.dataset.theme = eff;
+  document.querySelector('meta[name=theme-color]').content = eff === 'night' ? '#0F1118' : '#F3F4F0';
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,7 +25,7 @@
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Figtree:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Serif+Telugu:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Serif+Telugu:wght@500;600&display=swap" rel="stylesheet">
 <script src="vendor/supabase.min.js"></script>
 <style>
 :root{
@@ -24,11 +34,11 @@
   --miss:#D9483B; --missSoft:#FCE3E0; --shadow:0 1px 2px rgba(80,40,0,.06),0 6px 20px rgba(120,60,0,.07);
   --r:20px; --safeB:env(safe-area-inset-bottom,0px); --safeT:env(safe-area-inset-top,0px);
 }
-@media (prefers-color-scheme:dark){
+@media (prefers-color-scheme:dark) and (max-width:0px){
   :root{--bg:#17110C;--card:#231A13;--ink:#F6E9DA;--muted:#B39C86;--line:#3A2B1F;--soft:#3A2412;--okSoft:#173623;--missSoft:#3D1A16;--shadow:0 1px 2px rgba(0,0,0,.4)}
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;font-size:16px}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Outfit,system-ui,sans-serif;font-size:16px}
 body{min-height:100dvh;overscroll-behavior-y:none}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 input,textarea,select{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;width:100%;outline:none}
@@ -44,7 +54,7 @@ input:focus,textarea:focus{border-color:var(--saffron)}
 .bell.has{color:var(--deep)}
 .bell.has svg{animation:ring 2.4s ease-in-out 1}
 @keyframes ring{0%,100%{transform:none}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-14deg)}50%{transform:none}}
-.bell .badge{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#C2410C;color:#fff;font:700 11px/19px Figtree,sans-serif;text-align:center;box-shadow:0 0 0 2px var(--bg)}
+.bell .badge{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#C2410C;color:#fff;font:700 11px/19px Outfit,sans-serif;text-align:center;box-shadow:0 0 0 2px var(--bg)}
 .note{padding:4px 0 16px;margin-bottom:16px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5;color:var(--muted)}
 .note:last-child{border-bottom:0;margin-bottom:0}
 .note b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
@@ -58,7 +68,7 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)
 .sd-title{font-weight:800;font-size:19px;line-height:1.2}
 .sd-meta{color:var(--muted);font-size:13px;margin-top:4px}
 .pill{display:inline-flex;align-items:center;gap:6px;background:var(--soft);color:var(--deep);font-weight:700;font-size:12px;padding:5px 10px;border-radius:99px;white-space:nowrap}
-@media (prefers-color-scheme:dark){.pill{color:#FFB26B}}
+@media (prefers-color-scheme:dark) and (max-width:0px){.pill{color:#FFB26B}}
 .pill.ok{background:var(--okSoft);color:var(--ok)}
 .counter{display:flex;align-items:center;justify-content:center;gap:22px;margin:18px 0 8px}
 .ring{position:relative;width:168px;height:168px;border-radius:50%;display:grid;place-items:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:transform .08s}
@@ -82,7 +92,7 @@ h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)
 .dots i.excused{background:transparent;border:1.5px dashed var(--muted)}
 .row{display:flex;gap:10px;align-items:center}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:14px;font-weight:700;background:var(--soft);color:var(--deep)}
-@media (prefers-color-scheme:dark){.btn{color:#FFB26B}}
+@media (prefers-color-scheme:dark) and (max-width:0px){.btn{color:#FFB26B}}
 .btn.primary{background:var(--saffron);color:#fff}
 .btn.block{width:100%}
 .btn.sm{padding:9px 13px;font-size:14px;border-radius:12px}
@@ -115,7 +125,7 @@ nav.tabs svg{width:24px;height:24px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:10px 14px;border-radius:13px;background:var(--card);border:1.5px solid var(--line);font-weight:600;font-size:15px}
 .chip.on{border-color:var(--saffron);background:var(--soft);color:var(--deep)}
-@media (prefers-color-scheme:dark){.chip.on{color:#FFB26B}}
+@media (prefers-color-scheme:dark) and (max-width:0px){.chip.on{color:#FFB26B}}
 .chip small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
 .plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .plans .chip{text-align:left}
@@ -138,14 +148,14 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .verse .tx{font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-weight:500}
 .tel .verse .tx{font-family:"Noto Serif Telugu",serif}
 .verse .alt{font-size:.62em;color:var(--muted);white-space:nowrap}
-.reader .ttl{font-family:"Noto Serif Devanagari","Noto Serif Telugu",Figtree,serif}
+.reader .ttl{font-family:"Noto Serif Devanagari","Noto Serif Telugu",Outfit,serif}
 .tel .ttl,.tel .doha small{font-family:"Noto Serif Telugu",serif;letter-spacing:0;text-transform:none}
 .doha small{font-size:12px}
 .reader .doha small{letter-spacing:0;text-transform:none;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-size:13px}
 .tel .doha small{font-size:14px}
 .doha{text-align:center;margin:8px 0 26px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;line-height:1.8;color:var(--deep)}
-@media (prefers-color-scheme:dark){.doha{color:#FFB26B}}
-.doha small{display:block;font-family:Figtree;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+@media (prefers-color-scheme:dark) and (max-width:0px){.doha{color:#FFB26B}}
+.doha small{display:block;font-family:Outfit;font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
 .reader footer{padding:12px 16px calc(var(--safeB) + 12px);border-top:1px solid var(--line);background:var(--card)}
 .seg{display:inline-flex;background:var(--soft);border-radius:11px;padding:3px}
 .seg button{padding:6px 10px;border-radius:9px;font-weight:700;font-size:13px}
@@ -175,7 +185,7 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .rtools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line)}
 .rtools2{padding-top:0;border-bottom:1px solid var(--line)}
 .rtools2 .seg button{font-size:12px}
-#rjump{width:auto;max-width:46%;padding:7px 10px;font-size:13px;border-radius:10px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",Figtree,sans-serif}
+#rjump{width:auto;max-width:46%;padding:7px 10px;font-size:13px;border-radius:10px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",Outfit,sans-serif}
 .rcount{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 .reader .body.cbody{padding:0;max-width:none;overflow:hidden;display:flex;flex-direction:column;position:relative}
 .rprog{height:3px;background:var(--line);flex:none}
@@ -196,7 +206,7 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .ctext{overflow-wrap:anywhere;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif;font-size:1.18em;line-height:1.9;color:var(--ink);font-weight:500}
 .tel .ctext{font-family:"Noto Serif Telugu",serif}
 .rcard:not(.v) .ctext{color:var(--deep)}
-@media (prefers-color-scheme:dark){.rcard:not(.v) .ctext{color:#FFB26B}.rcard-in{box-shadow:0 18px 40px rgba(0,0,0,.4)}}
+@media (prefers-color-scheme:dark) and (max-width:0px){.rcard:not(.v) .ctext{color:#FFB26B}.rcard-in{box-shadow:0 18px 40px rgba(0,0,0,.4)}}
 .rcard .inv{font-size:.72em;color:var(--saffron);margin-bottom:6px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
 .rcard .opener{font-size:1.15em;font-weight:700;color:var(--deep);margin-bottom:16px;font-family:"Noto Serif Devanagari","Noto Serif Telugu",serif}
 .reader:not(.is-cards) .inv{text-align:center;font-size:.8em;color:var(--deep);margin-bottom:6px}
@@ -206,11 +216,11 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .ctext .alt{font-size:.6em}
 .gv{margin:0 0 .85em}.gv:last-child{margin-bottom:0}
 .gv-end{color:var(--deep);font-weight:600}
-@media (prefers-color-scheme:dark){.gv-end{color:#FFB26B}}
+@media (prefers-color-scheme:dark) and (max-width:0px){.gv-end{color:#FFB26B}}
 .rcard.grp{padding:10px 10px 14px}
 .rcard.grp .rcard-in{padding:16px 14px 18px;min-height:0;border-radius:22px}
 .rcard.grp .ctext{font-size:.8em;line-height:1.55}
-.mbtn{position:absolute;top:12px;right:14px;z-index:2;border:1px solid var(--line);background:var(--bg);color:var(--deep);border-radius:999px;padding:5px 12px;font:600 12px Figtree,"Noto Serif Telugu",sans-serif;cursor:pointer}
+.mbtn{position:absolute;top:12px;right:14px;z-index:2;border:1px solid var(--line);background:var(--bg);color:var(--deep);border-radius:999px;padding:5px 12px;font:600 12px Outfit,"Noto Serif Telugu",sans-serif;cursor:pointer}
 .reader:not(.is-cards) .mbtn{position:static;display:block;margin:0 auto 10px}
 .mean-bg{position:fixed;inset:0;z-index:80;background:rgba(20,14,6,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
 .mean-in{background:var(--card);width:100%;max-width:640px;max-height:86vh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:var(--safeB)}
@@ -280,6 +290,7 @@ nav.tabs button.on svg{animation:tabpop .4s cubic-bezier(.3,1.7,.5,1)}
 .or{text-align:center;color:var(--muted);font-size:13px;margin:6px 0}
 </style>
 <link rel="stylesheet" href="jaap.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <div id="app"></div>
@@ -843,12 +854,12 @@ const KINDS = {
   ] },
   navagraha: { title: 'Navagraha Vedic Mantras', unit: 'paath', emoji: '🪐', reader: 'devitext', group: true, deity: 'navagraha', heading: 'नवग्रहमन्त्राः',
     texts: ['ng_budha', 'ng_guru', 'ng_chandra', 'ng_kuja', 'ng_ketu', 'ng_rahu', 'ng_surya', 'ng_shukra', 'ng_shani'],
-    about: 'The Vedic mantras of the nine grahas in the Krishna Yajurveda (Taittiriya) form. For each graha: its own mantra, the mantras of its two devatas, then the closing namaskara. One paath is all nine, read straight through.',
+    about: 'The Vedic mantras of the nine grahas in the Krishna Yajurveda (Taittiriya) form. For each graha: its own mantra, the mantras of its two devatas, then the closing namaskara. Choose all nine or only some; one paath is the grahas you chose, read straight through.',
     plans: [
-    { n: 'Nitya', days: 40, count: 1, d: 'All nine, once a day · 40 days' },
-    { n: 'Mandala', days: 48, count: 1, d: 'All nine, once a day · 48 days' },
-    { n: '108 days', days: 108, count: 1, d: 'All nine, once a day' },
-    { n: '21 days', days: 21, count: 1, d: 'All nine, once a day' },
+    { n: 'Nitya', days: 40, count: 1, d: 'Once a day · 40 days' },
+    { n: 'Mandala', days: 48, count: 1, d: 'Once a day · 48 days' },
+    { n: '108 days', days: 108, count: 1, d: 'Once a day · 108 days' },
+    { n: '21 days', days: 21, count: 1, d: 'Once a day · 21 days' },
   ] },
   vishnu: { title: 'Vishnu Sahasranama', unit: 'paath', emoji: '🪷', reader: 'vishnu', deity: 'vishnu', plans: [
     { n: 'Nitya', days: 40, count: 1, d: '1 parayana a day · 40 days' },
@@ -880,6 +891,14 @@ const KINDS = {
   ] },
 };
 const kindOf = (s) => KINDS[s.kind] || KINDS.custom;
+const GLYPH = { chalisa: 'ह', saptashloki: 'दु', devi_trayam: 'अ', navagraha: 'न', vishnu: 'वि', ganesha: 'ग', sundarkand: 'सु', bajrang: 'ब', japa: 'ॐ', custom: '✦' };
+const glyphOf = (kind) => GLYPH[kind] || '✦';
+KINDS.navagraha.pick = true;
+KINDS.navagraha.parts = { ng_budha: ['बुधः', 'Budha'], ng_guru: ['बृहस्पतिः', 'Guru'], ng_chandra: ['सोमः', 'Chandra'], ng_kuja: ['अङ्गारकः', 'Kuja'], ng_ketu: ['केतुः', 'Ketu'],
+  ng_rahu: ['राहुः', 'Rahu'], ng_surya: ['सूर्यः', 'Surya'], ng_shukra: ['शुक्रः', 'Shukra'], ng_shani: ['शनैश्चरः', 'Shani'] };
+// the parts a sadhana reads, in the text's order (null texts = all)
+const partsOf = (s) => { const k = kindOf(s); if (!k.texts) return null; return s.texts && s.texts.length ? k.texts.filter((x) => s.texts.includes(x)) : k.texts; };
+const partsLabel = (s) => { const k = kindOf(s), p = partsOf(s); if (!k.pick || !p || p.length === k.texts.length) return ''; return p.length <= 3 ? p.map((x) => k.parts[x][1]).join(', ') : `${p.length} grahas`; };
 const DEITY = {
   hanuman: { days: [2, 6], note: '★ Tuesday & Saturday are Hanumanji\'s days.', guide: [
     'Start on a Tuesday or Saturday — ideally in Shukla Paksha (waxing moon).',
@@ -941,6 +960,7 @@ const LS = {
   set(k, v) { try { localStorage.setItem('sk.' + k, JSON.stringify(v)); } catch {} },
 };
 const S = {
+  open: new Set(),
   family: LS.get('family', null),
   me: LS.get('me', null),
   data: LS.get('data', { members: [], sadhanas: [], logs: [] }),
@@ -1089,14 +1109,14 @@ function tap(id, delta) {
   const completing = delta > 0 && before < s.daily_target && after >= s.daily_target;
   if (completing) dayComplete(s);
   render();
-  const ring = document.querySelector(`.ring[data-id="${id}"]`);
+  const ring = document.querySelector(`.ring[data-id="${id}"]`) || document.querySelector(`.tick[data-id="${id}"]`);
   if (ring && delta > 0) {
-    ring.classList.add('bump');
+    if (ring.classList.contains('ring')) ring.classList.add('bump');
     const rp = document.createElement('span'); rp.className = 'ripple'; ring.appendChild(rp);
     floatAt(ring, delta === 1 ? '+1' : '+' + delta);
   }
   if (completing) {
-    const card = ring && ring.closest('.card');
+    const card = ring && (ring.closest('.srow') || ring.closest('.card'));
     const todayDot = card && [...card.querySelectorAll('.dots i')][dayStates(s).findIndex((x) => x.d === today())];
     if (todayDot) todayDot.classList.add('justdone');
   }
@@ -1366,17 +1386,25 @@ function viewToday() {
       <p>Pick a sadhana, choose how many days, and a start day — Tuesday or Saturday is traditional for Hanumanji.</p>
       <button class="btn primary" data-act="new">Start Hanuman Chalisa</button></div>`;
   }
-  running.forEach((s) => { html += todayCard(s, t); });
+  if (running.length) html += weekStrip(mine, t);
+  // group by reminder time, earliest first; no reminder = Anytime
+  const groups = {};
+  running.slice().sort((x, y) => (x.reminder_time || '99').localeCompare(y.reminder_time || '99')).forEach((s) => {
+    const key = s.reminder_time ? s.reminder_time.slice(0, 5) : 'any'; (groups[key] = groups[key] || []).push(s);
+  });
+  Object.entries(groups).forEach(([key, ss]) => {
+    const h = key === 'any' ? null : +key.slice(0, 2);
+    const label = key === 'any' ? 'Anytime' : `${h < 12 ? 'Morning' : h < 17 ? 'Afternoon' : 'Evening'} · ${hm(key)}`;
+    const dn = ss.filter((s) => logOf(s.id, t) >= s.daily_target).length;
+    html += `<div class="ghead"><b>${label}</b><span>${dn === ss.length ? 'All done 🙏' : `${dn} of ${ss.length} done`}</span></div>
+      <div class="glist">${ss.map((s) => todayRow(s, t)).join('')}</div>`;
+  });
   if (upcoming.length) {
-    html += `<h2>Starting soon</h2>`;
-    upcoming.forEach((s) => {
+    html += `<div class="ghead"><b>Starting soon</b></div><div class="glist">${upcoming.map((s) => {
       const n = diff(t, s.start_date);
-      html += `<div class="card"><div class="sd-head"><div><div class="sd-title">${kindOf(s).emoji} ${esc(s.title)}</div>
-      <div class="sd-meta">${s.total_days} days · ${s.daily_target} ${esc(s.unit)}/day</div></div>
-      <span class="pill">${n === 1 ? 'Tomorrow' : 'In ' + n + ' days'}</span></div>
-      <div class="sd-meta" style="margin-top:10px">Begins ${fmt(s.start_date, { weekday: 'long', day: 'numeric', month: 'long' })}${s.reminder_time ? ' · reminder ' + hm(s.reminder_time) : ''}</div>
-      ${s.sankalp ? `<div class="sd-meta" style="margin-top:6px;font-style:italic">“${esc(s.sankalp)}”</div>` : ''}</div>`;
-    });
+      return `<div class="srow"><div class="srow-top"><span class="tick" aria-hidden="true"></span>
+        <div class="srow-t" data-act="edit" data-id="${s.id}"><div class="srow-n">${esc(s.title)}</div><div class="srow-m">Begins ${fmt(s.start_date, { weekday: 'short', day: 'numeric', month: 'short' })} · ${s.total_days} days</div></div>
+        <span class="srow-tag">${n === 1 ? 'Tomorrow' : 'In ' + n + ' days'}</span></div></div>`; }).join('')}</div>`;
   }
   html += Jaap.homeCard();
   // family
@@ -1405,6 +1433,49 @@ function seriesStrip(s) {
   return `<div class="series">${st.map((x) => `<span class="sstep ${x.status === 'completed' ? 'done' : x.id === s.id ? 'now' : ''}" title="${esc(x.title)}">${kindOf(x).emoji}</span>`).join('<i></i>')}
     <span class="snext">Stage ${s.series_order} of ${st.length}${next ? ` · next: ${esc(next.title)} from ${fmt(next.start_date, { day: 'numeric', month: 'short' })}` : ' · final stage'}</span></div>`;
 }
+function weekStrip(mine, t) {
+  let html = '<div class="week">';
+  for (let i = -6; i <= 0; i++) {
+    const d = addDays(t, i), on = mine.filter((s) => s.status !== 'queued' && diff(s.start_date, d) >= 0 && diff(s.start_date, d) < span(s) && !exc(s).includes(d));
+    const dn = on.filter((s) => logOf(s.id, d) >= targetOn(s, d)).length;
+    const st = !on.length ? '' : dn === on.length ? 'done' : dn ? 'part' : d < t ? 'miss' : '';
+    const dt = new Date(d + 'T00:00');
+    html += `<div class="${i === 0 ? 'now' : ''}"><small>${dt.toLocaleDateString('en-IN', { weekday: 'short' })}</small><b>${dt.getDate()}</b><i class="${st}"></i></div>`;
+  }
+  return html + '</div>';
+}
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>';
+function todayRow(s, t) {
+  const c = logOf(s.id, t), done = c >= s.daily_target, n = dayNo(s, t), k = kindOf(s);
+  const open = S.open.has(s.id), st = streakOf(s), multi = s.daily_target > 1;
+  const pl = partsLabel(s);
+  const meta = [`Day ${n} of ${s.total_days}`, multi ? `${c}/${s.daily_target} ${esc(s.unit)}s` : '', pl].filter(Boolean).join(' · ');
+  const frac = Math.min(1, c / s.daily_target), C = 2 * Math.PI * 16;
+  const tick = multi && !done
+    ? `<button class="tick multi" data-act="tick" data-id="${s.id}" aria-label="Add one ${esc(s.unit)}"><svg class="r" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="16" fill="none" stroke="var(--tick)" stroke-width="2.5"/><circle cx="18" cy="18" r="16" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"/></svg>${c}</button>`
+    : `<button class="tick${done ? ' done' : ''}" data-act="tick" data-id="${s.id}" aria-label="${done ? 'Done — tap to undo' : 'Mark done'}">${done ? CHECK : ''}</button>`;
+  const right = done ? (st >= 2 ? `<span class="srow-tag">🔥 ${st} days</span>` : '')
+    : k.reader ? `<button class="srow-read" data-act="read" data-id="${s.id}">Read</button>` : '';
+  return `<div class="srow${done ? ' done' : ''}${open ? ' open' : ''}" data-id="${s.id}">
+    <div class="srow-top">${tick}
+      <div class="srow-t" data-act="expand" data-id="${s.id}" role="button" aria-expanded="${open}"><div class="srow-n">${esc(s.title)}</div><div class="srow-m">${meta}</div></div>
+      ${right}</div>
+    ${open ? `<div class="srow-more">
+      ${s.sankalp ? `<div class="quote">“${esc(s.sankalp)}”</div>` : ''}
+      ${s.series_id ? seriesStrip(s) : ''}
+      <div class="counter">
+        <div class="side"><button class="mini ghost" data-act="dec" data-id="${s.id}" aria-label="Undo">−</button></div>
+        <div class="ring ${done ? 'done' : ''}" data-act="inc" data-id="${s.id}" role="button" aria-label="Add one">
+          ${ringSvg(c / s.daily_target, done, s.id)}
+          <div class="inner"><div><div class="big">${done && s.daily_target === 1 ? '✓' : c}</div>
+          <div class="small">${done ? 'Done today' : `of ${s.daily_target} · tap +1`}</div></div></div></div>
+        <div class="side">${k.reader ? `<button class="mini" data-act="read" data-id="${s.id}" aria-label="Read">📖</button>` : `<button class="mini" data-act="fill" data-id="${s.id}" aria-label="Mark all">✓</button>`}</div>
+      </div>
+      <div class="dots">${dayStates(s).map((x) => `<i class="${x.st}" title="${fmt(x.d)}"></i>`).join('')}</div>
+      <div class="actions"><button class="btn sm line" data-act="edit" data-id="${s.id}">Edit</button>${st >= 2 ? `<span class="streak"><b>🔥</b> ${st} days in a row</span>` : ''}</div>
+    </div>` : ''}
+  </div>`;
+}
 function todayCard(s, t) {
   const c = logOf(s.id, t), done = c >= s.daily_target, n = dayNo(s, t);
   const k = kindOf(s);
@@ -1428,35 +1499,89 @@ function todayCard(s, t) {
   </div>`;
 }
 
+function miniRing(frac, color = 'var(--accent)') {
+  const C = 2 * Math.PI * 14;
+  return `<svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="var(--line2)" stroke-width="4"/>
+    ${frac > 0 ? `<circle cx="18" cy="18" r="14" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - Math.min(1, frac))}" transform="rotate(-90 18 18)"/>` : ''}</svg>`;
+}
+function statusText(s) {
+  const t = today();
+  if (s.status === 'completed') return `Completed · ${s.total_days} days`;
+  if (s.status === 'broken') return `Restarted · reached day ${doneCount(s)}`;
+  if (s.status === 'stopped') return `Stopped · ${doneCount(s)} of ${s.total_days} days`;
+  if (s.status === 'queued') return `Stage ${s.series_order} · from ${fmt(s.start_date, { day: 'numeric', month: 'short' })}`;
+  if (isUpcoming(s, t)) return `Begins ${fmt(s.start_date, { weekday: 'short', day: 'numeric', month: 'short' })}`;
+  return [`Day ${dayNo(s, t)} of ${s.total_days}`, partsLabel(s)].filter(Boolean).join(' · ');
+}
+function calendarCard(s) {
+  const t = today(), states = {}; dayStates(s).forEach((x) => { states[x.d] = x.st; });
+  const base = new Date((isRunning(s, t) ? t : s.start_date) + 'T00:00');
+  const m = new Date(base.getFullYear(), base.getMonth() + (S.calOff || 0), 1);
+  const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const days = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+  let cells = '';
+  for (let i = 0; i < m.getDay(); i++) cells += '<i class="out"></i>';
+  for (let d = 1; d <= days; d++) { const k = iso(new Date(m.getFullYear(), m.getMonth(), d)); cells += `<i class="${states[k] && states[k] !== 'future' ? states[k] : ''}">${d}</i>`; }
+  const st = streakOf(s), own = s.member_id === S.me;
+  return `<div class="card" style="padding:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div class="srow-n" style="font-weight:600;font-size:17px">${esc(s.title)}</div>
+      <span class="srow-tag">${s.status === 'active' && isRunning(s, t) ? `Day ${dayNo(s, t)} of ${s.total_days}` : esc(statusText(s).split(' · ')[0])}</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+      <div class="srow-m">${m.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })}${st >= 2 ? ` · ${st}-day streak` : ''}${partsLabel(s) ? ` · ${partsLabel(s)}` : ''}</div>
+      <div class="cal-nav"><button data-act="cal" data-id="-1" aria-label="Previous month">‹</button><button data-act="cal" data-id="1" aria-label="Next month">›</button></div></div>
+    <div class="cal">${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((x) => `<span>${x}</span>`).join('')}${cells}</div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Done</span><span><i style="background:var(--mariSoft);box-shadow:inset 0 0 0 1.5px var(--mari)"></i>Partly</span><span><i style="background:var(--kum)"></i>Missed</span><span><i style="box-shadow:inset 0 0 0 1.5px var(--accent)"></i>Today</span></div>
+    ${own ? `<div class="actions"><button class="btn sm line" data-act="edit" data-id="${s.id}">Edit</button>${kindOf(s).reader && isRunning(s, t) ? `<button class="btn sm" data-act="read" data-id="${s.id}">Read</button>` : ''}</div>` : ''}
+  </div>`;
+}
 function viewHistory() {
-  const groups = S.data.members.slice().sort((a, b) => (a.id === S.me ? -1 : b.id === S.me ? 1 : 0));
-  let html = '';
-  groups.forEach((m) => {
-    const ss = S.data.sadhanas.filter((s) => s.member_id === m.id).sort((a, b) => b.start_date.localeCompare(a.start_date));
-    html += `<h2>${m.id === S.me ? 'Mine' : esc(m.name)}</h2>`;
-    if (!ss.length) { html += `<div class="card muted" style="font-size:14px">Nothing yet.</div>`; return; }
-    ss.forEach((s) => {
-      const st = s.status === 'completed' ? '<span class="pill ok">Completed</span>'
-        : s.status === 'broken' ? '<span class="pill" style="background:var(--missSoft);color:var(--miss)">Restarted</span>'
-        : s.status === 'stopped' ? '<span class="pill" style="background:var(--line);color:var(--muted)">Stopped</span>'
-        : s.status === 'queued' ? `<span class="pill" style="background:var(--line);color:var(--muted)">Stage ${s.series_order} · ${fmt(s.start_date, { day: 'numeric', month: 'short' })}</span>`
-        : isUpcoming(s) ? '<span class="pill">Upcoming</span>' : `<span class="pill">${doneCount(s)}/${s.total_days}</span>`;
-      html += `<div class="card"><div class="sd-head"><div><div class="sd-title">${kindOf(s).emoji} ${esc(s.title)}</div>
-        <div class="sd-meta">${fmt(s.start_date, { day: 'numeric', month: 'short', year: 'numeric' })} → ${fmt(endDate(s), { day: 'numeric', month: 'short' })} · ${s.daily_target} ${esc(s.unit)}/day</div></div>${st}</div>
-        <div class="dots">${dayStates(s).map((x) => `<i class="${x.st}" title="${fmt(x.d)}"></i>`).join('')}</div>
-        ${m.id === S.me ? `<div class="actions"><button class="btn sm line" data-act="edit" data-id="${s.id}">Edit</button></div>` : ''}</div>`;
+  const t = today(), f = S.histFilter || 'active';
+  const mine = S.data.sadhanas.filter((s) => s.member_id === S.me);
+  const act = mine.filter((s) => s.status === 'active' || s.status === 'queued').sort((a, b) => a.start_date.localeCompare(b.start_date) || (a.series_order || 0) - (b.series_order || 0));
+  const past = mine.filter((s) => !['active', 'queued'].includes(s.status)).sort((a, b) => b.start_date.localeCompare(a.start_date));
+  const others = S.data.members.filter((m) => m.id !== S.me);
+  const row = (s, actName) => `<div class="hrow${S.histSel === s.id && f === 'active' ? ' sel' : ''}" data-act="${actName}" data-id="${s.id}" role="button">
+      <div class="srow-t"><div class="srow-n">${esc(s.title)}</div><div class="srow-m" style="${s.status === 'broken' ? 'color:var(--kum)' : ''}">${esc(statusText(s))}</div></div>
+      ${miniRing(doneCount(s) / s.total_days, s.status === 'broken' ? 'var(--kum)' : 'var(--accent)')}</div>`;
+  let html = `<div class="fchips"><button class="${f === 'active' ? 'on' : ''}" data-act="hfilter" data-id="active">Active · ${act.length}</button>
+    <button class="${f === 'past' ? 'on' : ''}" data-act="hfilter" data-id="past">Past · ${past.length}</button>
+    ${others.length ? `<button class="${f === 'family' ? 'on' : ''}" data-act="hfilter" data-id="family">Family</button>` : ''}</div>`;
+  if (f === 'active') {
+    if (!act.length) return html + `<div class="card muted" style="font-size:14px">No active sadhana. Tap + to take a sankalp.</div>`;
+    const sel = act.find((s) => s.id === S.histSel) || act.find((s) => isRunning(s, t)) || act[0];
+    S.histSel = sel.id;
+    html += calendarCard(sel);
+    html += `<div class="glist" style="margin-top:12px">${act.map((s) => row(s, 'hsel')).join('')}</div>`;
+  } else if (f === 'past') {
+    html += past.length ? `<div class="glist">${past.map((s) => row(s, 'edit')).join('')}</div>` : `<div class="card muted" style="font-size:14px">Completed and stopped sadhanas will appear here.</div>`;
+  } else {
+    others.forEach((m) => {
+      const ss = S.data.sadhanas.filter((s) => s.member_id === m.id && (s.status === 'active' || s.status === 'completed')).sort((a, b) => b.start_date.localeCompare(a.start_date));
+      html += `<div class="ghead"><b>${esc(m.name)}</b><span>${ss.filter((s) => s.status === 'active').length} active</span></div>`;
+      html += ss.length ? `<div class="glist">${ss.map((s) => row(s, '')).join('')}</div>` : `<div class="card muted" style="font-size:14px">Nothing yet.</div>`;
     });
-  });
-  return html + `<div class="muted" style="font-size:12px;display:flex;gap:14px;flex-wrap:wrap;margin:6px 4px">
-    <span><i class="legend" style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--saffron)"></i> done</span>
-    <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--miss)"></i> missed</span>
-    <span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;border:1.5px dashed var(--muted)"></i> skipped & extended</span></div>`;
+  }
+  return html;
 }
 
+function applyTheme(t) {
+  const dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+  const eff = t === 'auto' ? (dark ? 'night' : 'day') : t;
+  document.documentElement.dataset.theme = eff;
+  const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = eff === 'night' ? '#0F1118' : '#F3F4F0';
+}
+if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (LS.get('theme', 'day') === 'auto') applyTheme('auto'); });
 function viewSettings() {
   const m = me();
   const link = location.origin + location.pathname + '?join=' + encodeURIComponent(S.family);
-  return `<h2>You</h2><div class="card">
+  const th = LS.get('theme', 'day');
+  return `<h2>Appearance</h2><div class="card">
+    <div class="themes">
+      <button class="${th === 'day' ? 'on' : ''}" data-act="theme" data-id="day" aria-pressed="${th === 'day'}"><span class="sw2 day"></span>Morning Light</button>
+      <button class="${th === 'night' ? 'on' : ''}" data-act="theme" data-id="night" aria-pressed="${th === 'night'}"><span class="sw2 night"></span>Diya Night</button>
+      <button class="${th === 'auto' ? 'on' : ''}" data-act="theme" data-id="auto" aria-pressed="${th === 'auto'}"><span class="sw2 auto"></span>Match phone</button>
+    </div></div>
+  <h2>You</h2><div class="card">
     <div class="row">${avatar(m, 46)}<input id="myname" value="${esc(m.name)}" maxlength="30" style="flex:1"></div>
     <div class="lbl" style="margin-top:14px">Colour</div>
     <div class="chips">${COLORS.map((c) => `<button class="chip ${c === m.color ? 'on' : ''}" data-act="color" data-id="${c}" style="width:44px;height:44px;padding:0;background:${c}" aria-label="colour"></button>`).join('')}</div>
@@ -1631,14 +1756,15 @@ function openNew() {
   const p = KINDS.chalisa.plans[0];
   S.form = { mode: 'new', kind: 'chalisa', title: KINDS.chalisa.title, unit: 'paath', plan: 0, days: p.days, count: p.count,
     start: new Date().getDay() === 2 || new Date().getDay() === 6 ? today() : nextWeekday(2), sankalp: '',
-    reminder: '06:00', nudgeOn: true, nudge: '21:00', who: [S.me], strict: true };
+    reminder: '06:00', nudgeOn: true, nudge: '21:00', who: [S.me], strict: true, step: 0, texts: null };
   openSheet();
 }
 function openEdit(id) {
   const s = S.data.sadhanas.find((x) => x.id === id);
   S.form = { mode: 'edit', id, title: s.title, sankalp: s.sankalp || '', reminder: (s.reminder_time || '').slice(0, 5),
     nudgeOn: !!s.nudge_time, nudge: (s.nudge_time || '21:00').slice(0, 5), status: s.status,
-    count: s.daily_target, days: s.total_days, start: s.start_date, unit: s.unit, strict: s.strict !== false };
+    count: s.daily_target, days: s.total_days, start: s.start_date, unit: s.unit, strict: s.strict !== false,
+    kind: s.kind, texts: kindOf(s).pick ? (partsOf(s) || []).slice() : null };
   openSheet();
 }
 function openSheet() { document.getElementById('layer').innerHTML = `<div class="sheet-bg" data-act="sheet-bg"><div class="sheet">${sheetHtml()}</div></div>`; }
@@ -1649,8 +1775,11 @@ function sheetHtml() {
   if (f.mode === 'edit') {
     const s = S.data.sadhanas.find((x) => x.id === f.id); const begun = s.start_date <= today();
     const U = (f.unit || 'times').replace(/^./, (c) => c.toUpperCase());
-    return `<div class="grab"></div><h3>Edit sadhana</h3>
+    const ek = KINDS[f.kind] || {};
+    return `<div class="stepbar"><button class="iconbtn" data-act="close-sheet" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="bars"></div></div>
+      <h3 style="margin-top:10px">Edit sadhana</h3>
       <div class="lbl">Name</div><input data-f="title" value="${esc(f.title)}" maxlength="50">
+      ${ek.pick ? `<div class="lbl">Grahas to read</div>${partsPicker(ek, f.texts || [])}` : ''}
       <div class="two" style="margin-top:14px"><div><label>${esc(U)}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div>
         <div><label>Total days</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div></div>
       ${begun ? `<div class="muted" style="font-size:12px;margin:6px 2px">A new count applies from today. Days already completed stay completed.</div>`
@@ -1666,30 +1795,56 @@ function sheetHtml() {
   const dt = deityOf(f.kind), t = today();
   const starts = [[t, 'Today'], ...dt.days.map((w) => nextWeekday(w)).sort().map((d) => [d, fmt(d) + ' ★'])].filter((x, i, a) => a.findIndex((y) => y[0] === x[0]) === i);
   const others = S.data.members.filter((m) => m.id !== S.me);
-  return `<div class="grab"></div><h3>New sankalp</h3>
-    <div class="muted" style="font-size:14px">Choose the sadhana, the length, and when to begin.</div>
-    <div class="lbl">Sadhana</div><div class="chips">
-      ${Object.entries(KINDS).map(([id, x]) => `<button class="chip ${f.kind === id ? 'on' : ''}" data-act="kind" data-id="${id}">${x.emoji} ${id === 'custom' ? 'Other' : esc(x.title)}</button>`).join('')}</div>
-    ${f.kind === 'custom' ? `<div class="two" style="margin-top:10px"><div><label>Name</label><input data-f="title" value="${esc(f.title)}" placeholder="e.g. Gayatri japa" maxlength="50"></div>
-      <div><label>Counted as</label><input data-f="unit" value="${esc(f.unit)}" placeholder="mala / paath" maxlength="12"></div></div>` : ''}
-    <div class="lbl">Plan</div><div class="plans">
-      ${k.plans.map((p, i) => `<button class="chip ${f.plan === i ? 'on' : ''}" data-act="plan" data-id="${i}">${esc(p.n)}<small>${esc(p.d)}</small></button>`).join('')}</div>
-    <div class="two" style="margin-top:10px"><div><label>${k.series ? 'Days per stage' : 'Days'}</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div>
-      <div><label id="unitlbl">${esc((f.unit || 'times').replace(/^./, (c) => c.toUpperCase()))}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div></div>
-    <div class="lbl">Start</div><div class="chips">
-      ${starts.map(([d, l]) => `<button class="chip ${f.start === d ? 'on' : ''}" data-act="start" data-id="${d}">${l}</button>`).join('')}
-      <input data-f="start" type="date" value="${f.start}" style="width:auto;flex:1;min-width:150px"></div>
-    <div class="muted" style="font-size:12px;margin:6px 2px">${dt.note} <span id="enddate">${k.series ? '' : endText()}</span></div>
-    ${k.series ? `<div class="lbl">Your path</div><div class="card" id="seriesplan" style="padding:6px 14px;margin:0">${seriesPlanHtml()}</div>` : ''}
-    <div class="lbl">Sankalp (intention)</div>
-    <textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional — what you dedicate this sadhana to">${esc(f.sankalp)}</textarea>
-    ${remindersHtml()}
-    ${strictHtml()}
-    ${others.length ? `<div class="lbl">Who is doing this?</div><div class="chips">
-      ${S.data.members.map((m) => `<button class="chip ${f.who.includes(m.id) ? 'on' : ''}" data-act="who" data-id="${m.id}">${m.id === S.me ? 'Me' : esc(m.name)}</button>`).join('')}</div>
-      <div class="muted" style="font-size:12px;margin:6px 2px">Each person gets their own tracker and reminders.</div>` : ''}
-    ${guideHtml(f.kind)}
-    <div class="actions" style="margin-top:20px"><button class="btn primary block" data-act="create-sadhana">Take the sankalp 🙏</button></div>`;
+  const steps = ['kind', ...(k.pick ? ['parts'] : []), 'plan', 'details'];
+  f.step = Math.min(f.step || 0, steps.length - 1);
+  const step = steps[f.step], lastStep = f.step === steps.length - 1;
+  const BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>';
+  const CLOSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  let html = `<div class="stepbar">${f.step ? `<button class="iconbtn" data-act="step-back" aria-label="Back">${BACK}</button>` : `<button class="iconbtn" data-act="close-sheet" aria-label="Close">${CLOSE}</button>`}
+    <div class="bars">${steps.map((x, i) => `<i class="${i <= f.step ? 'on' : ''}"></i>`).join('')}</div><span>${f.step + 1} of ${steps.length}</span></div>`;
+  if (step === 'kind') {
+    html += `<div class="kicker">New sankalp</div><h3>What will you take up?</h3><p class="lead">Pick a sadhana. You choose the plan and start day next.</p>
+      <div class="klist">${Object.entries(KINDS).map(([id, x]) => `<button class="kopt ${f.kind === id ? 'on' : ''}" data-act="kind" data-id="${id}">
+        <span class="g">${glyphOf(id)}</span><span><b>${id === 'custom' ? 'Something else' : esc(x.title)}</b><small>${id === 'custom' ? 'Any japa or paath, your own name and count' : esc(x.plans[0].d)}</small></span></button>`).join('')}</div>`;
+  } else if (step === 'parts') {
+    const sel = f.texts || [];
+    html += `<div class="kicker">${esc(k.title)}</div><h3>Which grahas will you read?</h3><p class="lead">Pick any. Many read three or six. The reader shows only these, in this order.</p>
+      ${partsPicker(k, sel)}`;
+  } else if (step === 'plan') {
+    html += `<div class="kicker">${esc(k.title || 'New sankalp')}</div><h3>How long, and when to begin?</h3>
+      ${f.kind === 'custom' ? `<div class="two" style="margin-top:10px"><div><label>Name</label><input data-f="title" value="${esc(f.title)}" placeholder="e.g. Gayatri japa" maxlength="50"></div>
+        <div><label>Counted as</label><input data-f="unit" value="${esc(f.unit)}" placeholder="mala / paath" maxlength="12"></div></div>` : ''}
+      <div class="lbl">Plan</div><div class="plans">
+        ${k.plans.map((p, i) => `<button class="chip ${f.plan === i ? 'on' : ''}" data-act="plan" data-id="${i}">${esc(p.n)}<small>${esc(p.d)}</small></button>`).join('')}</div>
+      <div class="two" style="margin-top:10px"><div><label>${k.series ? 'Days per stage' : 'Days'}</label><input data-f="days" type="number" inputmode="numeric" min="1" max="1000" value="${f.days}"></div>
+        <div><label id="unitlbl">${esc((f.unit || 'times').replace(/^./, (c) => c.toUpperCase()))}s per day</label><input data-f="count" type="number" inputmode="numeric" min="1" max="10000" value="${f.count}"></div></div>
+      <div class="lbl">Begins</div><div class="chips">
+        ${starts.map(([d, l]) => `<button class="chip ${f.start === d ? 'on' : ''}" data-act="start" data-id="${d}">${l}</button>`).join('')}
+        <input data-f="start" type="date" value="${f.start}" style="width:auto;flex:1;min-width:150px"></div>
+      <div class="muted" style="font-size:12.5px;margin:8px 2px">${dt.note} <span id="enddate">${k.series ? '' : endText()}</span></div>
+      ${k.series ? `<div class="lbl">Your path</div><div class="card" id="seriesplan" style="padding:6px 14px;margin:0">${seriesPlanHtml()}</div>` : ''}`;
+  } else {
+    html += `<div class="kicker">${esc(k.title || f.title || 'New sankalp')}</div><h3>Your sankalp</h3><p class="lead">An intention, reminders, and what happens if a day is missed.</p>
+      <div class="lbl">Sankalp (intention)</div>
+      <textarea data-f="sankalp" rows="2" maxlength="200" placeholder="Optional — what you dedicate this sadhana to">${esc(f.sankalp)}</textarea>
+      ${remindersHtml()}
+      ${strictHtml()}
+      ${others.length ? `<div class="lbl">Who is doing this?</div><div class="chips">
+        ${S.data.members.map((m) => `<button class="chip ${f.who.includes(m.id) ? 'on' : ''}" data-act="who" data-id="${m.id}">${m.id === S.me ? 'Me' : esc(m.name)}</button>`).join('')}</div>
+        <div class="muted" style="font-size:12px;margin:6px 2px">Each person gets their own tracker and reminders.</div>` : ''}
+      ${guideHtml(f.kind)}`;
+  }
+  html += `<div class="stepfoot">${lastStep ? `<button class="btn primary" data-act="create-sadhana">Take the sankalp 🙏</button>`
+    : `<button class="btn primary" data-act="step-next">${step === 'parts' ? `Continue · ${(f.texts || []).length} selected` : 'Continue'}</button>`}</div>`;
+  return html;
+}
+function partsPicker(k, sel) {
+  const order = k.texts.filter((x) => sel.includes(x));
+  return `<div class="prow"><b>${sel.length} selected</b><div style="display:flex;gap:8px">
+      <button class="pill-btn" data-act="parts-all">All ${k.texts.length}</button><button class="pill-btn mute" data-act="parts-none">Clear</button></div></div>
+    <div class="pgrid">${k.texts.map((x) => `<button class="ptile ${sel.includes(x) ? 'on' : ''}" data-act="part" data-id="${x}" aria-pressed="${sel.includes(x)}">
+      <span class="dv">${S.script === 'tel' ? toTelugu(k.parts[x][0]) : k.parts[x][0]}</span><span class="en">${k.parts[x][1]}</span></button>`).join('')}</div>
+    <div class="order">${order.length ? `Reading order: ${order.map((x) => k.parts[x][1]).join(', ')}` : 'Choose at least one graha.'}</div>`;
 }
 // The stages of a series, back to back from the chosen start.
 function seriesStages(f) {
@@ -1741,6 +1896,7 @@ function createSadhanas() {
   if (!(days >= 1 && days <= 1000)) return toast('Days should be 1–1000');
   if (!(count >= 1 && count <= 10000)) return toast('Count per day should be at least 1');
   if (!f.start) return toast('Pick a start date');
+  if (KINDS[f.kind].pick && !(f.texts || []).length) return toast('Choose at least one graha');
   const now = new Date().toISOString();
   if (KINDS[f.kind].series) {
     f.who.forEach((mid) => {
@@ -1759,7 +1915,7 @@ function createSadhanas() {
     return;
   }
   f.who.forEach((mid) => {
-    const s = { id: uid(), family_code: S.family, member_id: mid, kind: f.kind, title, unit: (f.unit || 'times').trim(),
+    const s = { id: uid(), family_code: S.family, member_id: mid, kind: f.kind, title, unit: (f.unit || 'times').trim(), texts: KINDS[f.kind].pick ? f.texts : null,
       daily_target: count, total_days: days, start_date: f.start, excused_dates: [], reminder_time: f.reminder || null,
       nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, sankalp: f.sankalp.trim() || null, status: 'active', strict: f.strict !== false, created_at: now, updated_at: now };
     S.data.sadhanas.push(s);
@@ -1777,6 +1933,7 @@ function saveEdit() {
   if (!(days >= 1 && days <= 1000)) return toast('Days should be 1–1000');
   const patch = { title: f.title.trim(), sankalp: f.sankalp.trim() || null, reminder_time: f.reminder || null,
     nudge_time: f.nudgeOn && f.nudge ? f.nudge : null, last_reminded_on: null, last_nudged_on: null, total_days: days, strict: f.strict !== false };
+  if ((KINDS[f.kind] || {}).pick) { if (!(f.texts || []).length) return toast('Choose at least one graha'); patch.texts = f.texts; }
   if (s.start_date > t) {
     if (!f.start) return toast('Pick a start date');
     patch.start_date = f.start; patch.daily_target = count;
@@ -1816,7 +1973,7 @@ function readerUnits(s, skipIntro) {
     return { title: te ? T.title : tr(T.title), units: U };
   }
   if (kindOf(s).reader === 'devitext') {
-    const parts = kindOf(s).texts || [s.kind], multi = parts.length > 1;
+    const parts = partsOf(s) || [s.kind], multi = parts.length > 1;
     const grp = kindOf(s).group;   // one card per text: all its verses together (Navagraha: one graha per card)
     parts.forEach((key, pi) => {
       const T = DEVI_TEXTS[key];
@@ -1824,7 +1981,7 @@ function readerUnits(s, skipIntro) {
         const html = T.rows.map(([, text, no]) => `<div class="gv${no ? '' : ' gv-end'}">${tr(text).replace(/\n/g, '<br>').replace(/\s*॥\s*$/, no ? ` ॥ ${no} ॥` : ' ॥')}</div>`).join('');
         const mb = NG_MEANING[key] ? `<button class="mbtn" data-act="mean" data-id="${key}">${te ? 'అర్థం' : 'Meaning'}</button>` : '';
         U.push({ cls: 'verse', grp: true, top: `${mb}${multi ? `<div class="inv">${pi + 1} / ${parts.length}</div>` : ''}<div class="opener">${tr(T.title)}</div>`,
-          label: '', html, section: multi, head: tr(T.name) });
+          label: '', html, section: multi, head: tr(T.name), mkey: NG_MEANING[key] ? key : null, nl: (kindOf(s).parts || {})[key]?.[1] || tr(T.short) });
         return;
       }
       let first = true;
@@ -1886,20 +2043,29 @@ function openReader(id, atStart) {
   const c = logOf(id, today()), target = s.daily_target;
   const { title, units } = readerUnits(s, S.readIntro === id);
   const cards = S.readMode === 'cards';
-  S.rUnits = units.length;
+  S.rUnits = units.length; S.rList = units;
   const doneBtn = `✓ Paath complete · ${Math.min(c + 1, target)} of ${target}`;
-  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''} ${cards ? 'is-cards' : ''}">
-    <header><button class="btn sm line" data-act="close-reader" aria-label="Close">✕</button><div class="ttl">${title}</div>
-      <div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div></header>
-    <div class="rtools"><div class="seg"><button class="${cards ? 'on' : ''}" data-act="rmode" data-id="cards">▢ Cards</button><button class="${cards ? '' : 'on'}" data-act="rmode" data-id="scroll">☰ Scroll</button></div>
-      <span class="rcount" id="rcount">${cards ? `1 / ${units.length}` : ''}</span>
-      <div class="row" style="gap:6px"><button class="btn sm line" data-act="font" data-id="-2">A−</button><button class="btn sm line" data-act="font" data-id="2">A+</button></div></div>
-    ${kindOf(s).reader === 'vishnu' || units.some((u) => u.section) ? `<div class="rtools rtools2">${kindOf(s).reader === 'vishnu' ? `<div class="seg"><button class="${S.vsnFull ? '' : 'on'}" data-act="vsnmode" data-id="gp">Gita Press</button><button class="${S.vsnFull ? 'on' : ''}" data-act="vsnmode" data-id="full">Full parayana</button></div>` : '<span class="rcount">Jump to</span>'}
-      ${cards ? `<select id="rjump" aria-label="Jump to section">${units.map((u, i) => u.section ? `<option value="${i}">${u.head}</option>` : '').join('')}</select>` : ''}</div>` : ''}
+  const segs = !cards ? '' : units.length <= 12 ? `<div class="rsegs" id="rsegs">${units.map(() => '<i></i>').join('')}</div>` : `<div class="rsegs bar" id="rsegs"><i><b id="rbar2"></b></i></div>`;
+  const vsn = kindOf(s).reader === 'vishnu', jump = cards && units.some((u) => u.section);
+  const hasMean = units.some((u) => u.mkey);
+  document.getElementById('layer').innerHTML = `<div class="reader ${S.script === 'tel' ? 'tel' : ''} ${cards ? 'is-cards has-segs' : ''} ${S.rset ? 'show-set' : ''}">
+    ${segs}
+    <header ${segs ? '' : 'style="padding-top:calc(var(--safeT) + 10px)"'}><button class="btn sm line" data-act="close-reader" aria-label="Close">✕</button>
+      <div class="ttl">${title}${cards ? ` · <span id="rcount">1 of ${units.length}</span>` : ''}</div>
+      <button class="aa" data-act="rset" aria-label="Reading settings" aria-expanded="${!!S.rset}">Aa</button></header>
+    <div class="rset">
+      <div class="grp"><div class="seg"><button class="${cards ? 'on' : ''}" data-act="rmode" data-id="cards">Cards</button><button class="${cards ? '' : 'on'}" data-act="rmode" data-id="scroll">Scroll</button></div></div>
+      <div class="grp"><div class="seg"><button class="${S.script === 'dev' ? 'on' : ''}" data-act="rscript" data-id="dev">अ</button><button class="${S.script === 'tel' ? 'on' : ''}" data-act="rscript" data-id="tel">అ</button></div>
+        <button class="btn sm line" data-act="font" data-id="-2" aria-label="Smaller text">A−</button><button class="btn sm line" data-act="font" data-id="2" aria-label="Larger text">A+</button></div>
+      ${vsn ? `<div class="grp"><div class="seg"><button class="${S.vsnFull ? '' : 'on'}" data-act="vsnmode" data-id="gp">Gita Press</button><button class="${S.vsnFull ? 'on' : ''}" data-act="vsnmode" data-id="full">Full parayana</button></div></div>` : ''}
+      ${jump ? `<div class="grp"><span class="lab">Jump to</span><select id="rjump" aria-label="Jump to section">${units.map((u, i) => u.section ? `<option value="${i}">${u.head}</option>` : '').join('')}</select></div>` : ''}
+    </div>
     ${cards ? `<div class="body cbody" id="rbody" style="font-size:${S.fs}px">${cardsHtml(units)}</div>`
       : `<div class="body" id="rbody" style="font-size:${S.fs}px">${scrollHtml(units)}</div>`}
     <footer>${cards
-      ? `<div class="cnav"><button class="btn line" data-act="cprev" aria-label="Previous">‹</button><button class="btn primary" id="cnext" data-act="cnext">Next ›</button></div>`
+      ? `<div class="rfoot2">${hasMean ? `<button class="btn" id="rmean" data-act="mean-cur">${S.script === 'tel' ? 'అర్థం · Meaning' : 'Meaning'}</button>` : ''}
+          <button class="btn scr" data-act="rscript" data-id="${S.script === 'tel' ? 'dev' : 'tel'}">${S.script === 'tel' ? 'देवनागरी' : 'తెలుగు లిపి'}</button></div>
+        <div class="cnav"><button class="btn line" data-act="cprev" aria-label="Previous">‹</button><button class="btn primary" id="cnext" data-act="cnext">Next ›</button></div>`
       : `<button class="btn primary block" data-act="reader-done" style="padding:16px">${doneBtn}</button>`}</footer></div>`;
   if (cards) initCards(doneBtn, atStart ? 0 : (S.cardPos && S.cardPos.id === id ? S.cardPos.i : 0));
 }
@@ -1925,9 +2091,14 @@ function initCards(doneBtn, startAt) {
   const setActive = (i) => {
     if (i === cur) return; cur = i;
     cards.forEach((c, k) => c.classList.toggle('active', k === i));
-    cnt.textContent = `${i + 1} / ${n}`; bar.style.width = ((i + 1) / n * 100) + '%';
+    if (cnt) cnt.textContent = `${i + 1} of ${n}`;
+    if (bar) bar.style.width = ((i + 1) / n * 100) + '%';
+    document.querySelectorAll('#rsegs > i:not(:only-child)').forEach((x, k) => x.classList.toggle('on', k <= i));
+    const b2 = document.getElementById('rbar2'); if (b2) b2.style.width = ((i + 1) / n * 100) + '%';
+    const U = S.rList || [], mb = document.getElementById('rmean');
+    if (mb) mb.style.visibility = U[i] && U[i].mkey ? 'visible' : 'hidden';
     const last = i === n - 1;
-    next.textContent = last ? doneBtn : 'Next ›'; next.dataset.act = last ? 'reader-done' : 'cnext';
+    next.textContent = last ? doneBtn : (U[i + 1] && U[i + 1].nl ? `Next · ${U[i + 1].nl}` : 'Next ›'); next.dataset.act = last ? 'reader-done' : 'cnext';
     next.classList.toggle('finish', last);
     S.cardPos = { id: S.reader, i };
     const j = document.getElementById('rjump');
@@ -2017,8 +2188,18 @@ document.addEventListener('click', async (e) => {
     case 'rmode': S.readMode = id; LS.set('readMode', id); openReader(S.reader); break;
     case 'vsnmode': S.vsnFull = id === 'full'; LS.set('vsnFull', S.vsnFull); S.cardPos = null; openReader(S.reader, true); break;
     case 'inbox': openInbox(); break;
+    case 'hfilter': S.histFilter = id; render(); break;
+    case 'theme': LS.set('theme', id); applyTheme(id); render(); break;
+    case 'hsel': S.histSel = id; S.calOff = 0; render(); break;
+    case 'cal': S.calOff = (S.calOff || 0) + +id; render(); break;
+    case 'expand': S.open.has(id) ? S.open.delete(id) : S.open.add(id); render(); break;
+    case 'tick': { const s = sd(); const c = logOf(id, today());
+      if (c >= s.daily_target) { if (s.daily_target === 1) tap(id, -1); else { S.open.add(id); render(); } }
+      else tap(id, 1); break; }
     case 'inbox-close': if (e.target === el || el.tagName === 'BUTTON') document.getElementById('inbox')?.remove(); break;
     case 'mean': openMeaning(id); break;
+    case 'mean-cur': { const u = (S.rList || [])[S.cardPos ? S.cardPos.i : 0]; if (u && u.mkey) openMeaning(u.mkey); break; }
+    case 'rset': S.rset = !S.rset; document.querySelector('.reader')?.classList.toggle('show-set', S.rset); el.setAttribute('aria-expanded', S.rset); break;
     case 'mean-close': if (e.target === el || el.tagName === 'BUTTON') document.getElementById('mean')?.remove(); break;
     case 'mean-lang': S.meanLang = id; LS.set('meanLang', id); openMeaning(document.getElementById('mean').dataset.key); break;
     case 'cprev': goCard(-1); break;
@@ -2030,7 +2211,7 @@ document.addEventListener('click', async (e) => {
     case 'sheet-bg': if (e.target === el) closeSheet(); break;
     case 'kind': { readForm(); const k = KINDS[id]; const dd = deityOf(id).days;
       const st = dd.includes(new Date().getDay()) ? today() : dd.map((w) => nextWeekday(w)).sort()[0];
-      Object.assign(S.form, { kind: id, title: k.title, unit: k.unit, plan: 0, days: k.plans[0].days || 0, months: k.plans[0].months || null, count: k.plans[0].count, start: st });
+      Object.assign(S.form, { kind: id, title: k.title, unit: k.unit, plan: 0, days: k.plans[0].days || 0, months: k.plans[0].months || null, count: k.plans[0].count, start: st, texts: k.pick ? k.texts.slice() : null });
       if (S.form.months) S.form.days = formDays(S.form); rerenderSheet(); break; }
     case 'plan': { readForm(); const p = KINDS[S.form.kind].plans[+id]; Object.assign(S.form, { plan: +id, days: p.days || 0, months: p.months || null, count: p.count });
       if (S.form.months) S.form.days = formDays(S.form); rerenderSheet(); break; }
@@ -2038,6 +2219,15 @@ document.addEventListener('click', async (e) => {
     case 'who': { readForm(); const w = S.form.who; S.form.who = w.includes(id) ? (w.length > 1 ? w.filter((x) => x !== id) : w) : [...w, id]; rerenderSheet(); break; }
     case 'nudge-toggle': readForm(); S.form.nudgeOn = !S.form.nudgeOn; rerenderSheet(); break;
     case 'create-sadhana': createSadhanas(); break;
+    case 'step-next': { readForm(); const f = S.form;
+      if ((KINDS[f.kind] || {}).pick && f.step === 1 && !(f.texts || []).length) { toast('Choose at least one graha'); break; }
+      if (f.kind === 'custom' && f.step === 1 && !(f.title || '').trim()) { toast('Give the sadhana a name'); break; }
+      f.step++; rerenderSheet(); document.querySelector('.sheet').scrollTop = 0; break; }
+    case 'step-back': readForm(); S.form.step = Math.max(0, (S.form.step || 0) - 1); rerenderSheet(); document.querySelector('.sheet').scrollTop = 0; break;
+    case 'part': { readForm(); const k = KINDS[S.form.kind]; const cur = S.form.texts || [];
+      S.form.texts = cur.includes(id) ? cur.filter((x) => x !== id) : k.texts.filter((x) => x === id || cur.includes(x)); rerenderSheet(); break; }
+    case 'parts-all': readForm(); S.form.texts = KINDS[S.form.kind].texts.slice(); rerenderSheet(); break;
+    case 'parts-none': readForm(); S.form.texts = []; rerenderSheet(); break;
     case 'save-edit': saveEdit(); break;
     case 'stop': if (confirm('Stop this sadhana? It stays in your history.')) { updateSadhana(S.data.sadhanas.find((x) => x.id === S.form.id), { status: 'stopped' }); closeSheet(); render(); } break;
     case 'delete': if (confirm('Delete this sadhana and all its logs?')) {

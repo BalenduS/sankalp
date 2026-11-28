@@ -419,7 +419,7 @@
     // milestones + records
     const ms = C.milestones(d.events, customCounts()), next = ms.items.find((i) => !i.achieved);
     h += `<h2>Milestones</h2><div class="h2sub">${num(ms.total)} lifetime repetitions. Private to you.</div><div class="card"><div class="jp-tl">${ms.items.map((i) => `<div class="jp-ms${i.achieved ? ' got' : ''}">
-        <div class="n">${num(i.count)}${i.custom ? ` <button class="muted" style="font:500 12px Figtree,sans-serif" data-jact="ms-del" data-id="${i.count}">remove</button>` : ''}</div>
+        <div class="n">${num(i.count)}${i.custom ? ` <button class="muted" style="font:500 12px Outfit,sans-serif" data-jact="ms-del" data-id="${i.count}">remove</button>` : ''}</div>
         <div class="s">${i.achieved ? 'Reached ' + fmt(i.date, { day: 'numeric', month: 'long', year: 'numeric' }) : i === next ? `${num(i.count - ms.total)} to go` : i.custom ? 'Your own milestone' : 'Ahead'}</div>${i === next ? track(i.frac, false) : ''}</div>`).join('')}</div>
       <div class="actions"><button class="btn sm line" data-jact="ms-add">+ Add your own milestone</button></div></div>`;
     const rc = C.records(days, d.sessions, d.events);
