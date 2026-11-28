@@ -199,6 +199,18 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .rcard.grp{padding:10px 10px 14px}
 .rcard.grp .rcard-in{padding:16px 14px 18px;min-height:0;border-radius:22px}
 .rcard.grp .ctext{font-size:.8em;line-height:1.55}
+.mbtn{position:absolute;top:12px;right:14px;z-index:2;border:1px solid var(--line);background:var(--bg);color:var(--deep);border-radius:999px;padding:5px 12px;font:600 12px Figtree,"Noto Serif Telugu",sans-serif;cursor:pointer}
+.reader:not(.is-cards) .mbtn{position:static;display:block;margin:0 auto 10px}
+.mean-bg{position:fixed;inset:0;z-index:80;background:rgba(20,14,6,.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.mean-in{background:var(--card);width:100%;max-width:640px;max-height:86vh;border-radius:24px 24px 0 0;display:flex;flex-direction:column;padding-bottom:var(--safeB)}
+.mean-hd{display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.mean-ttl{flex:1;font:700 1.15em "Noto Serif Devanagari","Noto Serif Telugu",serif;color:var(--deep)}
+.mean-hd .seg button{font-size:12px}
+.mean-body{overflow:auto;padding:16px 20px 26px;line-height:1.65;font-size:15px}
+.mean-in.te .mean-body{font-family:"Noto Serif Telugu",serif;font-size:16px;line-height:1.85}
+.mean-about{color:var(--muted);margin:0 0 16px}
+.mean-v{display:flex;gap:10px;margin-bottom:14px}.mean-v p{margin:0}
+.mean-no{color:var(--saffron);font-weight:700;white-space:nowrap;font-size:13px;padding-top:2px;min-width:38px}
 .rcard.grp .gv{margin-bottom:.6em}
 .rcard.grp .opener{margin-bottom:8px;font-size:1.05em}
 .rcard.grp .inv{margin-bottom:2px}
@@ -559,6 +571,225 @@ const DEVI_TEXTS = {
       ['', 'ॐ अधिदेवताप्रत्यधिदेवतासहिताय शनैश्चराय नमः॥', null],
     ],
   },
+};
+// Meanings of the Navagraha mantras: [English, Telugu] for the graha, then for each of the four verses
+const NG_MEANING = {
+ "ng_budha": {
+  "about": [
+   "Budha (Mercury) governs intellect, speech, learning and trade. This mantra is chanted for a clear mind, good communication, and success in studies and business.",
+   "బుధుడు బుద్ధి, వాక్కు, విద్య, వ్యాపారాలకు అధిపతి. స్పష్టమైన బుద్ధి, మంచి వాక్చాతుర్యం, విద్యలోనూ వ్యాపారంలోనూ విజయం కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Awaken, O Agni, and keep watch over this devotee. Together, bring forth the merit of his sacrifices and good deeds. Renewing you as a youthful father, he has carried the sacred thread of tradition onward in you.",
+    "ఓ అగ్నీ, మేల్కొను; ఈ భక్తుని కాపాడు. మీరిద్దరూ కలిసి అతని యజ్ఞాల, సత్కర్మల ఫలాన్ని సమకూర్చండి. నిన్ను యువకుడైన తండ్రిగా మళ్ళీ నిలిపి, అతను ఈ సంప్రదాయపు దారాన్ని నీలో కొనసాగించాడు."
+   ],
+   [
+    "Vishnu strode across this universe; three times he placed his foot. The whole world is held within his dust-covered footstep.",
+    "విష్ణువు ఈ విశ్వమంతటా అడుగులు వేశాడు; మూడుసార్లు తన పాదాన్ని మోపాడు. ఈ లోకమంతా ఆయన ధూళితో నిండిన పాదముద్రలో ఇమిడి ఉంది."
+   ],
+   [
+    "You are Vishnu's brow, Vishnu's joints, Vishnu's seam and Vishnu's firm foundation. You belong to Vishnu; I offer you to Vishnu.",
+    "నీవు విష్ణువు యొక్క లలాటానివి, కీళ్ళవి, కుట్టువి, స్థిరమైన ఆధారానివి. నీవు విష్ణువుకు చెందినదానివి; నిన్ను విష్ణువుకే సమర్పిస్తున్నాను."
+   ],
+   [
+    "Salutations to Budha, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన బుధునికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_guru": {
+  "about": [
+   "Brihaspati (Jupiter), the guru of the gods, governs wisdom, dharma, teachers, children and good fortune. This mantra is chanted for wisdom, right guidance and prosperity.",
+   "దేవతల గురువైన బృహస్పతి జ్ఞానం, ధర్మం, గురువులు, సంతానం, అదృష్టాలకు అధిపతి. జ్ఞానం, సరైన మార్గదర్శనం, సంపద కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "O Brihaspati, born of truth, grant us that wondrous wealth which the noble deserve, which shines among people with brilliance and wisdom, and glows with strength.",
+    "సత్యం నుండి పుట్టిన ఓ బృహస్పతీ, శ్రేష్ఠులకు తగినదీ, ప్రజలలో తేజస్సుతో, జ్ఞానంతో ప్రకాశించేదీ, బలంతో వెలిగేదీ అయిన ఆ అద్భుతమైన సంపదను మాకు ప్రసాదించు."
+   ],
+   [
+    "O Indra, with the Maruts, drink the Soma here, as you drank it at King Sharyata's sacrifice. Under your guidance and in your shelter, O hero, the wise who perform good sacrifices worship you.",
+    "మరుత్తులతో కూడిన ఓ ఇంద్రా, శార్యాత రాజు యజ్ఞంలో తాగినట్లే ఇక్కడ సోమాన్ని స్వీకరించు. ఓ వీరా, నీ మార్గదర్శనంలో, నీ ఆశ్రయంలో, మంచి యజ్ఞాలు చేసే జ్ఞానులు నిన్ను ఆరాధిస్తారు."
+   ],
+   [
+    "Brahman was born first, in the beginning; the radiant seer revealed it from the shining horizon. He revealed its deepest forms, the source of both what is and what is not.",
+    "ఆదిలో మొదటగా బ్రహ్మము ఆవిర్భవించింది; ప్రకాశించే దిగంతం నుండి తేజస్వి అయిన ద్రష్ట దానిని వెల్లడించాడు. ఉన్నదానికీ లేనిదానికీ మూలమైన దాని లోతైన రూపాలను ఆయన వెల్లడించాడు."
+   ],
+   [
+    "Salutations to Brihaspati, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన బృహస్పతికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_chandra": {
+  "about": [
+   "Chandra (the Moon), praised here as Soma, governs the mind, emotions, peace and health. This mantra is chanted for a calm mind, good health and emotional balance.",
+   "సోముడిగా స్తుతించబడే చంద్రుడు మనస్సు, భావోద్వేగాలు, శాంతి, ఆరోగ్యాలకు అధిపతి. ప్రశాంతమైన మనస్సు, మంచి ఆరోగ్యం, మానసిక సమతుల్యత కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Grow full, O Soma; may strength flow to you from every side. Be present where nourishment is gathered.",
+    "ఓ సోమా, వృద్ధి చెందు; అన్ని వైపుల నుండి నీకు బలం చేరాలి. పోషణ సమకూరే చోట నీవు ఉండు."
+   ],
+   [
+    "Soma told me that within the waters lie all medicines, and Agni who blesses all. The waters heal everything.",
+    "జలాలలోనే అన్ని ఔషధాలూ ఉన్నాయనీ, అందరికీ శుభం చేసే అగ్ని కూడా వాటిలో ఉన్నాడనీ సోముడు నాకు చెప్పాడు. జలాలు అన్నిటినీ నయం చేస్తాయి."
+   ],
+   [
+    "Gauri, the divine Word, fashioned the waters. She became one-footed, two-footed, four-footed, eight-footed and nine-footed, and dwells with a thousand syllables in the highest heaven.",
+    "దివ్యవాక్కు అయిన గౌరి జలాలను సృష్టించింది. ఆమె ఒకటి, రెండు, నాలుగు, ఎనిమిది, తొమ్మిది పాదాలు కలదిగా అయి, వేయి అక్షరాలతో పరమాకాశంలో విరాజిల్లుతుంది."
+   ],
+   [
+    "Salutations to Soma (Chandra), together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన సోమునికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_kuja": {
+  "about": [
+   "Angaraka (Mars), also called Kuja and Mangala, governs courage, energy, land and siblings. This mantra is chanted for strength, freedom from disputes and debts, and stability in property.",
+   "కుజుడు, మంగళుడు అని కూడా పిలువబడే అంగారకుడు ధైర్యం, శక్తి, భూమి, సోదరులకు అధిపతి. బలం, వివాదాల నుండి, ఋణాల నుండి విముక్తి, ఆస్తిలో స్థిరత్వం కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Agni is the head and summit of heaven, the lord of this earth. He quickens the seeds of the waters and gives them life.",
+    "అగ్ని స్వర్గానికి శిరస్సు, శిఖరం; ఈ భూమికి అధిపతి. ఆయన జలాలలోని బీజాలకు ప్రాణం పోస్తాడు."
+   ],
+   [
+    "O Earth, be gentle to us, free of thorns and a good place to dwell. Give us wide and lasting shelter.",
+    "ఓ భూమీ, మాకు సుఖకరమైనదానివిగా, ముళ్ళు లేనిదానివిగా, నివాసయోగ్యమైనదానివిగా ఉండు. మాకు విశాలమైన ఆశ్రయాన్ని ఇవ్వు."
+   ],
+   [
+    "With the Lord of the Field as our friend, we prosper. May he give us cows, horses and nourishment, and be kind to us.",
+    "క్షేత్రపాలకుడు మిత్రునిగా ఉండగా మేము విజయం పొందుతాము. ఆయన మాకు గోవులను, అశ్వాలను, పోషణను ఇచ్చి మాపై దయ చూపాలి."
+   ],
+   [
+    "Salutations to Angaraka, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన అంగారకునికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_ketu": {
+  "about": [
+   "Ketu governs spiritual insight, detachment and liberation. This mantra is chanted for clarity, protection from sudden troubles, and progress on the spiritual path.",
+   "కేతువు ఆధ్యాత్మిక జ్ఞానం, వైరాగ్యం, మోక్షాలకు కారకుడు. స్పష్టత, ఆకస్మిక కష్టాల నుండి రక్షణ, ఆధ్యాత్మిక ప్రగతి కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Making light where there was no light, and form where there was no form, you were born together with the dawns.",
+    "వెలుగు లేని చోట వెలుగును, రూపం లేని చోట రూపాన్ని కలిగిస్తూ, నీవు ఉషస్సులతో కలిసి జన్మించావు."
+   ],
+   [
+    "Brahma among the gods, leader among poets, seer among sages, the buffalo among beasts, the eagle among birds, the axe among trees: so does Soma pass through the filter, singing.",
+    "దేవతలలో బ్రహ్మ, కవులలో నాయకుడు, విప్రులలో ఋషి, మృగాలలో మహిషం, పక్షులలో డేగ, వృక్షాలలో గొడ్డలి వంటి సోముడు నాదం చేస్తూ పవిత్రాన్ని దాటి వెళ్తాడు."
+   ],
+   [
+    "O wondrous one of wondrous power, bring us wondrous, enlightening, life-giving brilliance. O bright one, grant the one who praises you great and shining wealth, rich in brave heirs.",
+    "అద్భుత శక్తి కల ఓ అద్భుతుడా, మాకు అద్భుతమైన, జ్ఞానాన్ని మేల్కొలిపే, ఆయుష్షునిచ్చే తేజస్సును ప్రసాదించు. ఓ ప్రకాశవంతుడా, నిన్ను స్తుతించేవానికి వీరసంతానంతో కూడిన గొప్ప సంపదను ఇవ్వు."
+   ],
+   [
+    "Salutations to Ketu, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన కేతువుకు నమస్కారం."
+   ]
+  ]
+ },
+ "ng_rahu": {
+  "about": [
+   "Rahu governs the hidden, the unexpected and worldly ambition. This mantra is chanted for relief from fear, confusion and hidden obstacles.",
+   "రాహువు గుప్త విషయాలు, అనుకోని సంఘటనలు, లౌకిక ఆకాంక్షలకు కారకుడు. భయం, గందరగోళం, కనిపించని అడ్డంకుల నుండి ఉపశమనం కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "With what help will the wondrous one, our ever-growing friend, come to us? With what most powerful company?",
+    "ఎల్లప్పుడూ వృద్ధి చెందే మిత్రుడైన ఆ అద్భుతుడు ఏ సహాయంతో మా దగ్గరకు వస్తాడు? ఏ మహాశక్తిమంతమైన తోడుతో వస్తాడు?"
+   ],
+   [
+    "This speckled bull has come forth and reached his mother again, and goes onward to his father, heaven.",
+    "ఈ చిత్రవర్ణపు వృషభం ముందుకు వచ్చి మళ్ళీ తన తల్లిని చేరింది; తన తండ్రి అయిన స్వర్గం వైపు సాగుతోంది."
+   ],
+   [
+    "The noose that the goddess Nirriti (destruction) tied around your neck, which cannot be undone, I untie, so that your life is not cut off midway. Now live, freed, and enjoy your food.",
+    "నిరృతి దేవి నీ మెడకు వేసిన, విడదీయలేని ఆ పాశాన్ని నీ ఆయుష్షు మధ్యలో తెగకుండా నేను విప్పుతున్నాను. ఇక విముక్తుడవై జీవించు, ఆహారాన్ని ఆనందించు."
+   ],
+   [
+    "Salutations to Rahu, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన రాహువుకు నమస్కారం."
+   ]
+  ]
+ },
+ "ng_surya": {
+  "about": [
+   "Surya (the Sun) governs health, vitality, confidence, the father and authority. This mantra is chanted for good health, energy and success.",
+   "సూర్యుడు ఆరోగ్యం, తేజస్సు, ఆత్మవిశ్వాసం, తండ్రి, అధికారాలకు అధిపతి. మంచి ఆరోగ్యం, శక్తి, విజయం కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Moving through the sky along his path of truth, bringing rest to immortals and mortals alike, Savitar the god comes in his golden chariot, beholding all the worlds.",
+    "సత్యమార్గంలో ఆకాశంలో సంచరిస్తూ, దేవతలకూ మానవులకూ విశ్రాంతినిస్తూ, సవితృ దేవుడు బంగారు రథంలో సమస్త లోకాలనూ చూస్తూ వస్తాడు."
+   ],
+   [
+    "We choose Agni as our messenger: the invoker of the gods, all-knowing, who performs this sacrifice well.",
+    "దేవతలను ఆహ్వానించేవాడు, సర్వజ్ఞుడు, ఈ యజ్ఞాన్ని చక్కగా నిర్వహించేవాడు అయిన అగ్నిని మేము దూతగా ఎన్నుకుంటున్నాము."
+   ],
+   [
+    "May this offering, which redeems the four-footed and two-footed beings ruled by Pashupati, reach its sacred share. May wealth and nourishment come to the one who offers it.",
+    "పశుపతి పాలించే నాలుగు కాళ్ళ, రెండు కాళ్ళ ప్రాణులను విమోచించే ఈ హవిస్సు తన యజ్ఞభాగాన్ని చేరాలి. యజమానికి సంపద, పుష్టి కలగాలి."
+   ],
+   [
+    "Salutations to Aditya (Surya), together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన ఆదిత్యునికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_shukra": {
+  "about": [
+   "Shukra (Venus) governs love, marriage, beauty, the arts and comforts. This mantra is chanted for harmony in relationships, a happy married life and prosperity.",
+   "శుక్రుడు ప్రేమ, వివాహం, సౌందర్యం, కళలు, సుఖాలకు అధిపతి. సంబంధాలలో సామరస్యం, సుఖమైన దాంపత్యం, సంపద కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "Bring your offering and pure, well-made praise to the bright, shining Agni, who moves with knowledge among all births, divine and human.",
+    "దివ్యమైన, మానవమైన సమస్త జన్మల మధ్య జ్ఞానంతో సంచరించే, ప్రకాశించే, తేజోవంతుడైన అగ్నికి మీ హవిస్సును, పవిత్రమైన స్తుతిని సమర్పించండి."
+   ],
+   [
+    "I have heard that among all women, Indrani is the most blessed in her husband, for her husband never dies of old age.",
+    "స్త్రీలందరిలో ఇంద్రాణి ఉత్తమ పతిని పొందిన సౌభాగ్యవతి అని నేను విన్నాను; ఆమె భర్త ఎన్నడూ వార్ధక్యంతో మరణించడు."
+   ],
+   [
+    "We call upon Indra for you, above all people. May he be ours alone.",
+    "మీ కోసం, సమస్త జనులకంటే మిన్నగా, ఇంద్రుని మేము ఆహ్వానిస్తున్నాము. ఆయన మాకే చెందినవాడై ఉండాలి."
+   ],
+   [
+    "Salutations to Shukra, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన శుక్రునికి నమస్కారం."
+   ]
+  ]
+ },
+ "ng_shani": {
+  "about": [
+   "Shanaishchara (Saturn) governs discipline, hard work, patience and longevity. This mantra is chanted for relief from hardship and delays, and for steadiness and long life.",
+   "శనైశ్చరుడు క్రమశిక్షణ, శ్రమ, సహనం, ఆయుష్షులకు అధిపతి. కష్టాలు, ఆలస్యాల నుండి ఉపశమనం, స్థిరత్వం, దీర్ఘాయుష్షు కోసం ఈ మంత్రాన్ని జపిస్తారు."
+  ],
+  "v": [
+   [
+    "May Agni, with all the fires, bring us peace. May the Sun shine kindly on us. May the wind blow pure for us and drive away all harm.",
+    "అగ్ని తన అగ్నులతో మాకు శాంతినివ్వాలి. సూర్యుడు మాపై శుభంగా ప్రకాశించాలి. వాయువు నిర్మలంగా వీచి, అన్ని హానులను దూరం చేయాలి."
+   ],
+   [
+    "O Yama, sit on this seat of sacred grass, together with the Angiras fathers. May the hymns of the poets bring you here. O King, rejoice in this offering.",
+    "ఓ యమా, అంగిరస పితృదేవతలతో కలిసి ఈ దర్భాసనంపై కూర్చో. కవులు రచించిన మంత్రాలు నిన్ను ఇక్కడికి తీసుకురావాలి. ఓ రాజా, ఈ హవిస్సుతో ఆనందించు."
+   ],
+   [
+    "O Prajapati, none other than you encompasses all these created beings. May the wishes with which we make offerings to you be fulfilled. May we become lords of riches.",
+    "ఓ ప్రజాపతీ, సృష్టించబడిన ఈ సమస్త ప్రాణులనూ నీవు తప్ప మరెవ్వరూ ఆవరించలేరు. ఏ కోరికలతో నీకు హవిస్సు సమర్పిస్తున్నామో అవి నెరవేరాలి. మేము సంపదలకు అధిపతులమవ్వాలి."
+   ],
+   [
+    "Salutations to Shanaishchara, together with his adhidevata and pratyadhidevata.",
+    "అధిదేవత, ప్రత్యధిదేవతలతో కూడిన శనైశ్చరునికి నమస్కారం."
+   ]
+  ]
+ }
 };
 // Devanagari → Telugu: the two Unicode blocks share a layout (offset 0x300).
 function toTelugu(s) {
@@ -1556,7 +1787,8 @@ function readerUnits(s, skipIntro) {
       const T = DEVI_TEXTS[key];
       if (grp) {
         const html = T.rows.map(([, text, no]) => `<div class="gv${no ? '' : ' gv-end'}">${tr(text).replace(/\n/g, '<br>').replace(/\s*॥\s*$/, no ? ` ॥ ${no} ॥` : ' ॥')}</div>`).join('');
-        U.push({ cls: 'verse', grp: true, top: `${multi ? `<div class="inv">${pi + 1} / ${parts.length}</div>` : ''}<div class="opener">${tr(T.title)}</div>`,
+        const mb = NG_MEANING[key] ? `<button class="mbtn" data-act="mean" data-id="${key}">${te ? 'అర్థం' : 'Meaning'}</button>` : '';
+        U.push({ cls: 'verse', grp: true, top: `${mb}${multi ? `<div class="inv">${pi + 1} / ${parts.length}</div>` : ''}<div class="opener">${tr(T.title)}</div>`,
           label: '', html, section: multi, head: tr(T.name) });
         return;
       }
@@ -1635,6 +1867,20 @@ function openReader(id, atStart) {
       ? `<div class="cnav"><button class="btn line" data-act="cprev" aria-label="Previous">‹</button><button class="btn primary" id="cnext" data-act="cnext">Next ›</button></div>`
       : `<button class="btn primary block" data-act="reader-done" style="padding:16px">${doneBtn}</button>`}</footer></div>`;
   if (cards) initCards(doneBtn, atStart ? 0 : (S.cardPos && S.cardPos.id === id ? S.cardPos.i : 0));
+}
+function openMeaning(key) {
+  const M = NG_MEANING[key], T = DEVI_TEXTS[key]; if (!M) return;
+  const lang = S.meanLang || LS.get('meanLang') || (S.script === 'tel' ? 'te' : 'en'), li = lang === 'te' ? 1 : 0;
+  const name = S.script === 'tel' ? toTelugu(T.name) : T.name;
+  document.getElementById('mean')?.remove();
+  const d = document.createElement('div'); d.id = 'mean'; d.className = 'mean-bg'; d.dataset.act = 'mean-close'; d.dataset.key = key;
+  d.innerHTML = `<div class="mean-in ${lang === 'te' ? 'te' : ''}" role="dialog" aria-label="Meaning">
+    <div class="mean-hd"><div class="mean-ttl">${name}</div>
+      <div class="seg"><button class="${lang === 'en' ? 'on' : ''}" data-act="mean-lang" data-id="en">English</button><button class="${lang === 'te' ? 'on' : ''}" data-act="mean-lang" data-id="te">తెలుగు</button></div>
+      <button class="btn sm line" data-act="mean-close" aria-label="Close">✕</button></div>
+    <div class="mean-body"><p class="mean-about">${esc(M.about[li])}</p>
+      ${M.v.map((v, i) => `<div class="mean-v"><span class="mean-no">${i < 3 ? `॥ ${i + 1} ॥` : '॥'}</span><p>${esc(v[li])}</p></div>`).join('')}</div></div>`;
+  document.body.appendChild(d);
 }
 function initCards(doneBtn, startAt) {
   const box = document.getElementById('cards'); if (!box) return;
@@ -1735,6 +1981,9 @@ document.addEventListener('click', async (e) => {
     case 'rscript': S.script = id; LS.set('script', id); openReader(S.reader); break;
     case 'rmode': S.readMode = id; LS.set('readMode', id); openReader(S.reader); break;
     case 'vsnmode': S.vsnFull = id === 'full'; LS.set('vsnFull', S.vsnFull); S.cardPos = null; openReader(S.reader, true); break;
+    case 'mean': openMeaning(id); break;
+    case 'mean-close': if (e.target === el || el.tagName === 'BUTTON') document.getElementById('mean')?.remove(); break;
+    case 'mean-lang': S.meanLang = id; LS.set('meanLang', id); openMeaning(document.getElementById('mean').dataset.key); break;
     case 'cprev': goCard(-1); break;
     case 'cnext': goCard(1); break;
     case 'font': { S.fs = Math.min(34, Math.max(16, S.fs + +id)); LS.set('fs', S.fs); document.getElementById('rbody').style.fontSize = S.fs + 'px'; break; }
