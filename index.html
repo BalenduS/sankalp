@@ -193,6 +193,17 @@ details.guide ul{padding-left:18px;margin:8px 0 0;line-height:1.55;font-size:14p
 .tel .opener,.tel .inv{font-family:"Noto Serif Telugu",serif}
 .iti{margin-top:14px;font-size:.85em}
 .ctext .alt{font-size:.6em}
+.gv{margin:0 0 .85em}.gv:last-child{margin-bottom:0}
+.gv-end{color:var(--deep);font-weight:600}
+@media (prefers-color-scheme:dark){.gv-end{color:#FFB26B}}
+.rcard.grp{padding:10px 10px 14px}
+.rcard.grp .rcard-in{padding:16px 14px 18px;min-height:0;border-radius:22px}
+.rcard.grp .ctext{font-size:.8em;line-height:1.55}
+.rcard.grp .gv{margin-bottom:.6em}
+.rcard.grp .opener{margin-bottom:8px;font-size:1.05em}
+.rcard.grp .inv{margin-bottom:2px}
+.tel .rcard.grp .ctext{font-size:.76em;line-height:1.6}
+.reader:not(.is-cards) .verse .gv-end{text-align:center}
 .cnav{display:flex;gap:10px}
 .cnav .btn.line{width:58px;font-size:22px;padding:12px 0}
 .cnav .btn.primary{flex:1;padding:15px;transition:background .3s}
@@ -588,7 +599,7 @@ const KINDS = {
     { n: '3 months', months: 3, count: 1, d: 'All four, once a day' }, { n: 'Nitya', days: 40, count: 1, d: 'All four · 40 days' },
     { n: '9 months', months: 9, count: 1, d: 'All four, once a day' }, { n: 'Navaratri', days: 9, count: 1, d: 'All four · 9 nights' },
   ] },
-  navagraha: { title: 'Navagraha Vedic Mantras', unit: 'paath', emoji: '🪐', reader: 'devitext', deity: 'navagraha', heading: 'नवग्रहमन्त्राः',
+  navagraha: { title: 'Navagraha Vedic Mantras', unit: 'paath', emoji: '🪐', reader: 'devitext', group: true, deity: 'navagraha', heading: 'नवग्रहमन्त्राः',
     texts: ['ng_budha', 'ng_guru', 'ng_chandra', 'ng_kuja', 'ng_ketu', 'ng_rahu', 'ng_surya', 'ng_shukra', 'ng_shani'],
     about: 'The Vedic mantras of the nine grahas in the Krishna Yajurveda (Taittiriya) form. For each graha: its own mantra, the mantras of its two devatas, then the closing namaskara. One paath is all nine, read straight through.',
     plans: [
@@ -1540,8 +1551,15 @@ function readerUnits(s, skipIntro) {
   }
   if (kindOf(s).reader === 'devitext') {
     const parts = kindOf(s).texts || [s.kind], multi = parts.length > 1;
+    const grp = kindOf(s).group;   // one card per text: all its verses together (Navagraha: one graha per card)
     parts.forEach((key, pi) => {
       const T = DEVI_TEXTS[key];
+      if (grp) {
+        const html = T.rows.map(([, text, no]) => `<div class="gv${no ? '' : ' gv-end'}">${tr(text).replace(/\n/g, '<br>').replace(/\s*॥\s*$/, no ? ` ॥ ${no} ॥` : ' ॥')}</div>`).join('');
+        U.push({ cls: 'verse', grp: true, top: `${multi ? `<div class="inv">${pi + 1} / ${parts.length}</div>` : ''}<div class="opener">${tr(T.title)}</div>`,
+          label: '', html, section: multi, head: tr(T.name) });
+        return;
+      }
       let first = true;
       T.rows.forEach(([label, text, no, intro]) => {
         if (intro && skipIntro) return;
@@ -1586,13 +1604,13 @@ function readerUnits(s, skipIntro) {
 }
 function scrollHtml(U) {
   return U.map((u) => {
-    if (u.cls === 'verse') return `${u.top || ''}${u.head ? `<div class="doha" style="margin:-6px 0 14px"><small>${u.head}</small></div>` : ''}<div class="verse">${u.no ? `<span class="no">${u.no}</span>` : ''}<span class="tx">${u.html}</span></div>`;
+    if (u.cls === 'verse') return `${u.top || ''}${u.head && !u.grp ? `<div class="doha" style="margin:-6px 0 14px"><small>${u.head}</small></div>` : ''}<div class="verse">${u.no ? `<span class="no">${u.no}</span>` : ''}<span class="tx">${u.html}</span></div>`;
     return `${u.section && u.cls !== 'verse' && u.label !== u.head ? `<div class="doha" style="margin:6px 0 10px"><small>${u.head}</small></div>` : ''}${u.top || ''}<div class="doha"${u.cont ? ' style="margin-top:-18px"' : ''}>${u.label && !u.cont ? `<small>${u.label}</small>` : ''}${u.html}</div>`;
   }).join('');
 }
 function cardsHtml(U) {
   return `<div class="rprog"><i id="rbar"></i></div><div class="cards" id="cards">${U.map((u, i) =>
-    `<section class="rcard${u.cls === 'verse' ? ' v' : ''}${u.html.replace(/<[^>]+>/g, '').length > 120 ? ' long' : ''}" data-i="${i}"><div class="rcard-in">
+    `<section class="rcard${u.cls === 'verse' ? ' v' : ''}${u.grp ? ' grp' : ''}${u.html.replace(/<[^>]+>/g, '').length > 120 ? ' long' : ''}" data-i="${i}"><div class="rcard-in">
       ${u.top || ''}${u.label ? `<div class="clabel">${u.label}</div>` : ''}<div class="ctext">${u.html}</div>
     </div></section>`).join('')}</div>`;
 }
