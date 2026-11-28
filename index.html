@@ -39,6 +39,17 @@ input:focus,textarea:focus{border-color:var(--saffron)}
 .top h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.3px}
 .top .sub{color:var(--muted);font-size:13px;margin-top:2px}
 .sync{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.bell{position:relative;flex:none;width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.bell svg{width:20px;height:20px}
+.bell.has{color:var(--deep)}
+.bell.has svg{animation:ring 2.4s ease-in-out 1}
+@keyframes ring{0%,100%{transform:none}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-14deg)}50%{transform:none}}
+.bell .badge{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:#C2410C;color:#fff;font:700 11px/19px Figtree,sans-serif;text-align:center;box-shadow:0 0 0 2px var(--bg)}
+.note{padding:4px 0 16px;margin-bottom:16px;border-bottom:1px solid var(--line);font-size:14px;line-height:1.5;color:var(--muted)}
+.note:last-child{border-bottom:0;margin-bottom:0}
+.note b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.note .actions{margin-top:10px}
+.note-empty{text-align:center;color:var(--muted);padding:30px 0;font-size:15px;line-height:2}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
 .dot.off{background:#BBB}.dot.wait{background:var(--saffron2)}
 h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:26px 4px 10px;font-weight:700}
@@ -1257,6 +1268,7 @@ function render() {
   if (!S.user || !S.family || !S.me || !me()) { app.innerHTML = onboarding(); return; }
   const body = S.tab === 'today' ? viewToday() : S.tab === 'jaap' ? Jaap.view() : S.tab === 'history' ? viewHistory() : viewSettings();
   const enter = S.enter; S.enter = false;
+  { const ib = document.getElementById('inbox'); if (ib) ib.innerHTML = inboxHtml(); }
   const html = `<div class="wrap${enter ? ' enter' : ''}">${header()}${body}</div>
   ${S.tab === 'today' || S.tab === 'history' ? `<button class="fab" data-act="new" aria-label="New sadhana">+</button>` : ''}
   <nav class="tabs"><div class="in">
@@ -1280,7 +1292,24 @@ function header() {
   return `<div class="top"><img src="icons/icon-192.png" alt="">
     <div><h1>${S.tab === 'today' ? `${greet}, ${esc(me().name)}` : S.tab === 'jaap' ? 'Naam Jaap' : S.tab === 'history' ? 'Sadhanas' : 'Settings'}</h1>
     <div class="sub">${fmt(today(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
-    <div class="sync" id="sync">${syncHtml()}</div></div>`;
+    <div class="sync" id="sync">${syncHtml()}</div>${bellHtml()}</div>`;
+}
+function bellHtml() {
+  const n = S.user && S.me ? notices().length : 0;
+  return `<button class="bell${n ? ' has' : ''}" data-act="inbox" aria-label="Notifications${n ? ` (${n})` : ''}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>
+    ${n ? `<span class="badge">${n}</span>` : ''}</button>`;
+}
+function inboxHtml() {
+  const list = notices();
+  return `<div class="mean-in" role="dialog" aria-label="Notifications">
+    <div class="mean-hd"><div class="mean-ttl" style="font-family:inherit">Notifications</div><button class="btn sm line" data-act="inbox-close" aria-label="Close">✕</button></div>
+    <div class="mean-body">${list.length ? list.join('') : `<div class="note-empty">🙏<br>All clear. Nothing needs your attention.</div>`}</div></div>`;
+}
+function openInbox() {
+  document.getElementById('inbox')?.remove();
+  const d = document.createElement('div'); d.id = 'inbox'; d.className = 'mean-bg'; d.dataset.act = 'inbox-close';
+  d.innerHTML = inboxHtml(); document.body.appendChild(d);
 }
 function syncHtml() {
   if (!navigator.onLine) return `<span class="dot off"></span>Offline`;
@@ -1290,6 +1319,33 @@ function syncHtml() {
 }
 function renderSync() { const el = document.getElementById('sync'); if (el) el.innerHTML = syncHtml(); }
 
+// Notices (a sankalp restarted after a missed day, or a missed day to resolve) live behind the bell, not on Today
+function notices() {
+  const t = today(), out = [];
+  const mine = S.data.sadhanas.filter((s) => s.member_id === S.me);
+  // restarted after a missed day
+  LS.get('restarts', []).filter((n) => n.on >= addDays(t, -2) && S.data.sadhanas.some((x) => x.id === n.neu && x.status === 'active')).forEach((n) => {
+    out.push(`<div class="note"><b>🔁 ${esc(n.title)} begins again — Day 1 ${n.on === t ? 'is today' : 'was ' + fmt(n.on)}</b>
+      ${fmt(n.missed, { weekday: 'long', day: 'numeric', month: 'short' })} was missed, so the sankalp restarted from Day 1.
+      <div class="actions">
+        <button class="btn sm primary" data-act="restart-ok" data-id="${n.neu}">Jai! Begin again</button>
+        <button class="btn sm line" data-act="restart-undo" data-id="${n.neu}">I did it, just forgot to log</button>
+      </div></div>`);
+  });
+  // missed-day prompts (only for sankalps that allow extending)
+  mine.filter((s) => s.status === 'active' && s.strict === false && diff(s.start_date, t) > 0).forEach((s) => {
+    const md = missedDates(s).filter((d) => d < t);
+    if (!md.length) return;
+    out.push(`<div class="note"><b>${esc(s.title)}: ${md.length === 1 ? `Day missed — ${fmt(md[0])}` : `${md.length} days incomplete`}</b>
+      This sankalp allows extending. You choose:
+      <div class="actions">
+        <button class="btn sm line" data-act="fix-log" data-id="${s.id}">I did it, just forgot to log</button>
+        <button class="btn sm line" data-act="extend" data-id="${s.id}">Continue, add ${md.length === 1 ? 'a day' : md.length + ' days'} at the end</button>
+        <button class="btn sm danger" data-act="restart" data-id="${s.id}">Restart from Day 1</button>
+      </div></div>`);
+  });
+  return out;
+}
 function viewToday() {
   const t = today();
   const mine = S.data.sadhanas.filter((s) => s.member_id === S.me);
@@ -1305,27 +1361,6 @@ function viewToday() {
       : 'Get a nudge at your chosen time, and know when your brother finishes his paath.'}
       <div class="actions"><button class="btn primary sm" data-act="push">Enable</button><button class="btn line sm" data-act="push-later">Later</button></div></div>`;
   }
-  // restarted after a missed day
-  LS.get('restarts', []).filter((n) => n.on >= addDays(t, -2) && S.data.sadhanas.some((x) => x.id === n.neu && x.status === 'active')).forEach((n) => {
-    html += `<div class="banner miss restart"><b>🔁 ${esc(n.title)} begins again — Day 1 ${n.on === t ? 'is today' : 'was ' + fmt(n.on)}</b>
-      ${fmt(n.missed, { weekday: 'long', day: 'numeric', month: 'short' })} was missed, so the sankalp restarted from Day 1.
-      <div class="actions">
-        <button class="btn sm primary" data-act="restart-ok" data-id="${n.neu}">Jai! Begin again</button>
-        <button class="btn sm line" data-act="restart-undo" data-id="${n.neu}">I did it, just forgot to log</button>
-      </div></div>`;
-  });
-  // missed-day prompts (only for sankalps that allow extending)
-  mine.filter((s) => s.status === 'active' && s.strict === false && diff(s.start_date, t) > 0).forEach((s) => {
-    const md = missedDates(s).filter((d) => d < t);
-    if (!md.length) return;
-    html += `<div class="banner miss"><b>${esc(s.title)}: ${md.length === 1 ? `Day missed — ${fmt(md[0])}` : `${md.length} days incomplete`}</b>
-      This sankalp allows extending. You choose:
-      <div class="actions">
-        <button class="btn sm line" data-act="fix-log" data-id="${s.id}">I did it, just forgot to log</button>
-        <button class="btn sm line" data-act="extend" data-id="${s.id}">Continue, add ${md.length === 1 ? 'a day' : md.length + ' days'} at the end</button>
-        <button class="btn sm danger" data-act="restart" data-id="${s.id}">Restart from Day 1</button>
-      </div></div>`;
-  });
   if (!running.length && !upcoming.length) {
     html += `<div class="card empty"><img src="icons/icon-192.png" alt=""><h3>Begin a sankalp</h3>
       <p>Pick a sadhana, choose how many days, and a start day — Tuesday or Saturday is traditional for Hanumanji.</p>
@@ -1981,6 +2016,8 @@ document.addEventListener('click', async (e) => {
     case 'rscript': S.script = id; LS.set('script', id); openReader(S.reader); break;
     case 'rmode': S.readMode = id; LS.set('readMode', id); openReader(S.reader); break;
     case 'vsnmode': S.vsnFull = id === 'full'; LS.set('vsnFull', S.vsnFull); S.cardPos = null; openReader(S.reader, true); break;
+    case 'inbox': openInbox(); break;
+    case 'inbox-close': if (e.target === el || el.tagName === 'BUTTON') document.getElementById('inbox')?.remove(); break;
     case 'mean': openMeaning(id); break;
     case 'mean-close': if (e.target === el || el.tagName === 'BUTTON') document.getElementById('mean')?.remove(); break;
     case 'mean-lang': S.meanLang = id; LS.set('meanLang', id); openMeaning(document.getElementById('mean').dataset.key); break;
